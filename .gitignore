@@ -1,0 +1,41 @@
+﻿# --- OS ---
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# --- IDE ---
+.vscode/
+.idea/
+*.swp
+
+# --- Environment ---
+.env
+.env.*
+!.env.example
+*.local
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# --- Node ---
+node_modules/
+dist/
+build/
+*.tsbuildinfo
+
+# --- Logs & temp ---
+logs/
+*.log
+tmp/
+
+# --- Docker override محلی ---
+docker-compose.override.yml
