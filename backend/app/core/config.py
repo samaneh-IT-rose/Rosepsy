@@ -18,6 +18,18 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "postgresql+psycopg://roz:roz_dev@localhost:5432/roz"
     REDIS_URL: str = "redis://localhost:6379/0"
 
+    # --- B02 / OTP & sessions (spec s.12: TTL 2min, max 5 tries, temporary lockout) ---
+    OTP_PEPPER: str = "dev-pepper-change-me"
+    OTP_CODE_LENGTH: int = 6
+    OTP_CODE_TTL_SECONDS: int = 120
+    OTP_MAX_ATTEMPTS: int = 5
+    OTP_LOCK_SECONDS: int = 900
+    OTP_REQUEST_LIMIT_PHONE: int = 3
+    OTP_REQUEST_LIMIT_IP: int = 20
+    OTP_RATE_WINDOW_SECONDS: int = 600
+    AUTH_SESSION_TTL_SECONDS: int = 7 * 24 * 3600
+    SMS_PROVIDER: str = "mock"  # D04 still open; mock writes the code to the log
+
 
 @lru_cache
 def get_settings() -> Settings:

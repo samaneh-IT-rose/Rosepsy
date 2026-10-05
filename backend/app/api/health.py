@@ -48,10 +48,20 @@ def ready():
     elapsed_ms = round((time.perf_counter() - start) * 1000, 1)
     ok = all(v == "ok" for v in checks.values())
 
+    payload = {
+        "status": "ready" if ok else "not_ready",
+        "checks": checks,
+        "elapsed_ms": elapsed_ms,
+    }
     body = envelope(
-        data={"status": "ready" if ok else "not_ready", "checks": checks, "elapsed_ms": elapsed_ms},
+        data=payload,
         errors=None
         if ok
-        else [{"code": "DEPENDENCY_UNAVAILABLE", "message": "یک یا چند وابستگی سرویس در دسترس نیست"}],
+        else [
+            {
+                "code": "DEPENDENCY_UNAVAILABLE",
+                "message": "یک یا چند وابستگی سرویس در دسترس نیست",
+            }
+        ],
     )
     return JSONResponse(status_code=200 if ok else 503, content=body)

@@ -3,14 +3,21 @@ import time
 import uuid
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 
-from app.api import health
+from app.api import auth, health, me
+from app.api.schemas import envelope
 from app.core.config import settings
 from app.core.logging import request_id_var, setup_logging
 
 setup_logging(level=settings.LOG_LEVEL)
 logger = logging.getLogger("roz.http")
+
+ERROR_MESSAGES = {
+    "UNAUTHORIZED": "احراز هویت لازم است",
+}
 
 
 @asynccontextmanager
@@ -42,14 +49,43 @@ async def request_context_middleware(request: Request, call_next):
         duration_ms = round((time.perf_counter() - start) * 1000, 1)
         response.headers["X-Request-ID"] = rid
         logger.info(
-            "http %s %s -> %s (%sms)", request.method, request.url.path, response.status_code, duration_ms
+            "http %s %s -> %s (%sms)",
+            request.method,
+            request.url.path,
+            response.status_code,
+            duration_ms,
         )
         return response
     finally:
         request_id_var.reset(token)
 
 
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    """Render HTTP errors in the standard envelope with Persian messages (contract s.10)."""
+    code = str(exc.detail)
+    message = ERROR_MESSAGES.get(code, "درخواست قابل قبول نیست")
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=envelope(errors=[{"code": code, "message": message}]),
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    errors = []
+    for raw in exc.errors():
+        loc = raw.get("loc", [])
+        field_name = str(loc[-1]) if len(loc) > 1 else None
+        errors.append(
+            {"code": "VALIDATION_ERROR", "message": "ورودی نامعتبر است", "field": field_name}
+        )
+    return JSONResponse(status_code=422, content=envelope(errors=errors))
+
+
 app.include_router(health.router)
+app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
+app.include_router(me.router, prefix=settings.API_V1_PREFIX)
 
 
 @app.get("/")
