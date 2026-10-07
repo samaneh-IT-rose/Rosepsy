@@ -308,3 +308,15 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - مجوزهای جدید: tariffs.manage، topics.manage (system_admin)؛ رد دسترسی‌ها audit می‌شود
 - محیط: compose با restart: unless-stopped به‌روز شد (ری‌استارت خودکار کانتینرها)
 - content_topics به B33 موکول شد (نیازمند جدول contents)
+
+---
+
+## 26) گام 10 — B08 پیاده‌سازی شد (اسپرینت S6)
+- مهاجرت 0006: booking.availability_weekly_rules + booking.availability_exceptions (اولین جداول schema booking)
+- قواعد هفتگی به ساعت دیواری محلی (TZ سراسری Asia/Tehran در config) و ماده‌سازی به UTC هنگام تولید اسلات — سازگار با قاعده UTC سند
+- استثنا = بازه بلاک UTC (پوشش مرخصی و بلاک موردی)؛ حذف کامل روز با یک استثنا شبانه‌روزی
+- مولد اسلات به‌صورت تابع خالص services/slots.py با now تزریقی → 6 تست واحد قطعی (جاافتادن کامل در پنجره، تقسیم با استثنا، حذف گذشته، مرخصی کل روز، روز اشتباه هفته)
+- API: PUT/GET rules (جایگزینی کامل + رد هم‌پوشانی 409) · POST/DELETE exceptions · GET availability (اسلات آزاد per خدمت، سقف 31 روز)
+- مالکیت تقویم: مشاور فقط خودش، system_admin همه؛ رد → 403 + audit
+- سرویس غیرفعال → 404 برای query اسلات؛ کسر نوبت‌های رزروشده در B09/S7 به همان تابع خالص اضافه می‌شود
+- محیط: scripts/env-check.ps1 ساخته شد (Docker check + compose up + pytest) — همیشه قبل از کار اجرا شود

@@ -1,4 +1,4 @@
-﻿"""Seed roles/permissions and bootstrap the first system admin (idempotent)."""
+"""Seed roles/permissions and bootstrap the first system admin (idempotent)."""
 
 import uuid
 
@@ -34,10 +34,12 @@ PERMISSIONS: list[tuple[str, str]] = [
     ("branches.manage", "ویرایش و انتشار شعبه (با برانچ‌اسکوپ)"),
     ("tariffs.manage", "مدیریت تعرفه‌ها و نسخه‌های قیمت"),
     ("topics.manage", "مدیریت دسته‌بندی موضوعی"),
+    ("availability.manage", "مدیریت تقویم و دسترس‌پذیری"),
 ]
 
 GRANTS: dict[str, list[str]] = {
     "reception": ["applicants.create", "applicants.read"],
+    "consultant": ["availability.manage"],
     "system_admin": [
         "applicants.create",
         "applicants.read",
@@ -51,6 +53,7 @@ GRANTS: dict[str, list[str]] = {
         "branches.manage",
         "tariffs.manage",
         "topics.manage",
+        "availability.manage",
     ],
 }
 

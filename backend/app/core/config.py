@@ -30,6 +30,9 @@ class Settings(BaseSettings):
     AUTH_SESSION_TTL_SECONDS: int = 7 * 24 * 3600
     SMS_PROVIDER: str = "mock"  # D04 still open; mock writes the code to the log
 
+    # --- B08 / availability: local wall-clock timezone for weekly rules ---
+    AVAILABILITY_TIMEZONE: str = "Asia/Tehran"
+
 
 @lru_cache
 def get_settings() -> Settings:

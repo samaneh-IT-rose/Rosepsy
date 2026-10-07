@@ -1,4 +1,4 @@
-﻿import os
+import os
 
 os.environ.setdefault("DATABASE_URL", "postgresql+psycopg://roz:roz_dev@localhost:5432/roz")
 os.environ.setdefault("REDIS_URL", "redis://localhost:6379/0")
@@ -13,6 +13,8 @@ from app.services.sms import get_sms_sender
 
 SCHEMAS = ["core", "booking", "clinical", "finance", "content", "edu", "audit"]
 TABLES = [
+    "booking.availability_exceptions",
+    "booking.availability_weekly_rules",
     "core.auth_sessions",
     "core.user_roles",
     "core.role_permissions",

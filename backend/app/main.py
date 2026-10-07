@@ -1,4 +1,4 @@
-﻿import logging
+import logging
 import time
 import uuid
 from contextlib import asynccontextmanager
@@ -10,6 +10,7 @@ from fastapi.responses import JSONResponse
 from app.api import (
     applicants,
     auth,
+    availability,
     catalog,
     clinics,
     consultants,
@@ -105,6 +106,7 @@ app.include_router(consultants.router, prefix=settings.API_V1_PREFIX)
 app.include_router(clinics.router, prefix=settings.API_V1_PREFIX)
 app.include_router(pricing.router, prefix=settings.API_V1_PREFIX)
 app.include_router(topics.router, prefix=settings.API_V1_PREFIX)
+app.include_router(availability.router, prefix=settings.API_V1_PREFIX)
 
 
 @app.get("/")
