@@ -1,8 +1,4 @@
-"""Seed roles/permissions and bootstrap the first system admin.
-
-The eight roles mirror the spec role table (s.04/15). Only the permissions
-needed so far (B03/B04) are attached; later sprints extend GRANTS.
-"""
+"""Seed roles/permissions and bootstrap the first system admin (idempotent)."""
 
 import uuid
 
@@ -30,11 +26,28 @@ PERMISSIONS: list[tuple[str, str]] = [
     ("applicants.read", "مشاهده و جست‌وجوی متقاضیان"),
     ("roles.read", "مشاهده نقش‌ها و مجوزها"),
     ("roles.assign", "تخصیص و سلب نقش کاربران"),
+    ("services.manage", "مدیریت تخصص‌ها و خدمات"),
+    ("consultants.read", "مشاهده مشاوران"),
+    ("consultants.manage", "ایجاد و ویرایش مشاوران و مدارک"),
+    ("consultants.review", "بررسی و تأیید صلاحیت مشاوران"),
+    ("clinics.manage", "مدیریت مراکز، شعب و خدمات شعبه"),
+    ("branches.manage", "ویرایش و انتشار شعبه (با برانچ‌اسکوپ)"),
 ]
 
 GRANTS: dict[str, list[str]] = {
     "reception": ["applicants.create", "applicants.read"],
-    "system_admin": ["applicants.create", "applicants.read", "roles.read", "roles.assign"],
+    "system_admin": [
+        "applicants.create",
+        "applicants.read",
+        "roles.read",
+        "roles.assign",
+        "services.manage",
+        "consultants.read",
+        "consultants.manage",
+        "consultants.review",
+        "clinics.manage",
+        "branches.manage",
+    ],
 }
 
 

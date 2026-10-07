@@ -22,6 +22,14 @@ TABLES = [
     "core.users",
     "core.roles",
     "core.permissions",
+    "core.verification_reviews",
+    "core.credentials",
+    "core.consultants",
+    "core.services",
+    "core.specialties",
+    "core.branch_service_offerings",
+    "core.branches",
+    "core.clinics",
     "audit.audit_logs",
 ]
 

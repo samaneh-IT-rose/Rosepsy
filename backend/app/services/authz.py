@@ -1,4 +1,4 @@
-"""Authorization services for B04: permission checks, role grants, audit writes."""
+"""Authorization services for B04+: permission checks, branch scope, audit."""
 
 import uuid
 
@@ -19,6 +19,26 @@ def has_permission(db: Session, user_id: uuid.UUID, code: str) -> bool:
         .limit(1)
     )
     return db.execute(stmt).scalar_one_or_none() is not None
+
+
+def scoped_branch_ids(
+    db: Session, user_id: uuid.UUID, permission_code: str
+) -> set[uuid.UUID] | None:
+    """Branch scope for a permission (ABAC light, spec s.12).
+
+    None  => at least one grant has branch_id NULL => global access.
+    set() => the user is restricted to exactly these branches.
+    """
+    stmt = (
+        select(UserRole.branch_id)
+        .join(RolePermission, RolePermission.role_id == UserRole.role_id)
+        .join(Permission, Permission.id == RolePermission.permission_id)
+        .where(UserRole.user_id == user_id, Permission.code == permission_code)
+    )
+    rows = db.execute(stmt).scalars().all()
+    if any(b is None for b in rows):
+        return None
+    return {b for b in rows if b is not None}
 
 
 def write_audit(

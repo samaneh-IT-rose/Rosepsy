@@ -286,3 +286,14 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - تصمیم‌ها: صفحه‌بندی limit/offset سقف 100 (cursor بعداً)؛ برانچ‌اسکوپ ذخیره می‌شود و از S4 عملیاتی می‌شود؛ audit بدون FK به users (پایداری ممیزی)
 - پیش‌فرض‌های عددی B02 بسته شد: همان مقادیر config (3/10min per phone، 20/10min per IP، نشست 7 روز) — قابل تغییر بدون کد
 - D02 درگاه: باز — در S8 با آداپتور mock پیاده می‌شود تا با تصمیم آینده فقط یک کلاس عوض شود
+
+---
+
+## 24) گام 8 — B05 + B06 + B31 پیاده‌سازی شد (اسپرینت S4)
+- مهاجرت 0004: specialties/services/consultants/credentials/verification_reviews/clinics/branches/branch_service_offerings — همگی در schema core (داده مرجع)؛ booking برای نوبت‌ها محفوظ است
+- B05: eligibility = status approved + حداقل مدرک verified با expires_at معتبر؛ /consultants پیش‌فرض فقط قابل‌رزرو؛ /verification-reviews تأیید مدرک → ارتقای مشاور؛ لینک مشاور به کاربر → نقش consultant خودکار
+- B06: مدت > 0 با CheckConstraint + Pydantic؛ خدمت غیرفعال از فهرست و خدمات شعبه حذف می‌شود
+- B31: slug یکتا (clinic/branch/specialty)، lat/lon دو لایه (Pydantic + CheckConstraint)، شعبه draft/published/archived و فقط published عمومی؛ offerings: خدمت ناموجود یا غیرفعال در شعبه نمایش داده نمی‌شود
+- برانچ‌اسکوپ عملیاتی شد: scoped_branch_ids در PATCH /branches/{id}؛ رد خارج‌از‌scope → 403 + audit
+- مجوزهای جدید: services.manage، consultants.read/manage/review، clinics.manage، branches.manage (system_admin)
+- حوادث محیطی: کانتینرها خاموش شده بودند (ConnectionTimeout) → با docker compose up ترمیم شد
