@@ -1,7 +1,7 @@
 """Booking core (B09): eligibility, block gathering, hold expiry, price snapshot."""
 
 import uuid
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from sqlalchemy import select
@@ -20,7 +20,7 @@ def consultant_is_bookable(db: Session, consultant: Consultant) -> bool:
     """approved status AND at least one verified, unexpired credential (spec B05)."""
     if consultant.status != "approved":
         return False
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     stmt = (
         select(Credential.id)
         .where(
@@ -35,7 +35,7 @@ def consultant_is_bookable(db: Session, consultant: Consultant) -> bool:
 
 def expire_stale_holds(db: Session) -> int:
     """Release expired holds lazily (spec: 'hold منقضی آزاد شود')."""
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     stale = (
         db.execute(
             select(SlotClaim).where(SlotClaim.status == "held", SlotClaim.expires_at <= now)

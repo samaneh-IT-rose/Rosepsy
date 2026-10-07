@@ -69,9 +69,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["hold_id"], ["booking.slot_claims.id"], ondelete="SET NULL"),
         schema="booking",
     )
-    op.create_index(
-        "ix_booking_appointments_user", "appointments", ["user_id"], schema="booking"
-    )
+    op.create_index("ix_booking_appointments_user", "appointments", ["user_id"], schema="booking")
     op.execute(
         "ALTER TABLE booking.appointments ADD CONSTRAINT ex_booking_appointments_active "
         "EXCLUDE USING gist (consultant_id WITH =, tstzrange(start_at, end_at, '[)') WITH &&) "

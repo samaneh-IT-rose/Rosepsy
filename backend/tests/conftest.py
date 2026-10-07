@@ -13,6 +13,10 @@ from app.services.sms import get_sms_sender
 
 SCHEMAS = ["core", "booking", "clinical", "finance", "content", "edu", "audit"]
 TABLES = [
+    "finance.invoice_items",
+    "finance.invoices",
+    "finance.payments",
+    "finance.orders",
     "booking.appointments",
     "booking.slot_claims",
     "booking.availability_exceptions",
@@ -62,7 +66,7 @@ def prepare_db():
         for schema in SCHEMAS:
             conn.execute(text('CREATE SCHEMA IF NOT EXISTS "' + schema + '"'))
         conn.execute(text("CREATE EXTENSION IF NOT EXISTS btree_gist"))
-    import app.models  # noqa: F401  (register tables on metadata)
+    import app.models  # noqa: F401
 
     Base.metadata.create_all(engine)
     with engine.begin() as conn:
@@ -77,7 +81,16 @@ def prepare_db():
 
 def _cleanup() -> None:
     with engine.begin() as conn:
-        conn.execute(text("TRUNCATE TABLE " + ", ".join(TABLES) + " CASCADE"))
+        rows = conn.execute(
+            text(
+                "SELECT table_schema || '.' || table_name FROM information_schema.tables "
+                "WHERE table_schema IN ('core','booking','finance','audit')"
+            )
+        ).scalars().all()
+        existing = set(rows)
+        targets = [t for t in TABLES if t in existing]
+        if targets:
+            conn.execute(text("TRUNCATE TABLE " + ", ".join(targets) + " CASCADE"))
     redis = get_redis()
     for key in redis.scan_iter("rl:otp:*"):
         redis.delete(key)

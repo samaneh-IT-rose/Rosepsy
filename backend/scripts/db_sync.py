@@ -6,6 +6,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from alembic.config import Config
+from alembic.script import ScriptDirectory
 from sqlalchemy import inspect, text
 
 from alembic import command
@@ -14,7 +15,7 @@ from app.core.db import engine
 
 def main() -> None:
     cfg = Config("alembic.ini")
-    head = (command.heads(cfg) or "").split()[0]
+    head = ScriptDirectory.from_config(cfg).get_current_head()
     insp = inspect(engine)
     current = None
     if insp.has_table("alembic_version"):
@@ -24,7 +25,6 @@ def main() -> None:
     if current == head:
         print(f"db_sync: already at head ({head})")
         return
-
     if current is None:
         if insp.has_table("users", schema="core"):
             command.stamp(cfg, head)
@@ -33,7 +33,6 @@ def main() -> None:
             command.upgrade(cfg, "head")
             print(f"db_sync: upgraded empty DB to {head}")
         return
-
     try:
         command.upgrade(cfg, "head")
         print(f"db_sync: upgraded {current} -> {head}")

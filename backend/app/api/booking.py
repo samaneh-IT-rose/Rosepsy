@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel, Field
@@ -17,7 +17,6 @@ from app.models.catalog import Consultant, Service
 from app.models.core import User
 from app.services.authz import write_audit
 from app.services.booking import (
-    ACTIVE_APPOINTMENT_STATUSES,
     consultant_is_bookable,
     expire_stale_holds,
     price_snapshot,
@@ -76,18 +75,14 @@ def create_hold(
     db: Session = Depends(get_db),
 ):
     """Temporary slot hold with TTL (B09)."""
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     expire_stale_holds(db)
 
     consultant = db.get(Consultant, body.consultant_id)
     if consultant is None:
         return error_response("CONSULTANT_NOT_FOUND", "مشاور یافت نشد", 404)
     if not consultant_is_bookable(db, consultant):
-        return error_response(
-            "CONSULTANT_NOT_BOOKABLE",
-            "این مشاور در حال حاضر قابل رزرو نیست",
-            409,
-        )
+        return error_response("CONSULTANT_NOT_BOOKABLE", "این مشاور در حال حاضر قابل رزرو نیست", 409)
     service = db.get(Service, body.service_id)
     if service is None or not service.is_active:
         return error_response("SERVICE_NOT_FOUND", "خدمت یافت نشد یا غیرفعال است", 404)
@@ -104,7 +99,7 @@ def create_hold(
         return error_response(
             "VALIDATION_ERROR", "زمان باید شامل منطقه زمانی (UTC) باشد", 422, field="start_at"
         )
-    start_at = start_at.astimezone(timezone.utc)
+    start_at = start_at.astimezone(UTC)
     end_at = start_at + timedelta(minutes=service.duration_minutes)
 
     err = validate_hold_window(
@@ -125,15 +120,11 @@ def create_hold(
             422,
         )
     if err == "SLOT_UNAVAILABLE":
-        return error_response(
-            "SLOT_UNAVAILABLE", "این زمان با تقویم مشاور هم‌خوان نیست", 409
-        )
+        return error_response("SLOT_UNAVAILABLE", "این زمان با تقویم مشاور هم‌خوان نیست", 409)
     if err == "SLOT_TAKEN":
         return error_response("SLOT_TAKEN", "این زمان قبلا رزرو یا نگهداری شده است", 409)
 
-    snapshot = price_snapshot(
-        db, service_id=service.id, branch_id=body.branch_id, at=now
-    )
+    snapshot = price_snapshot(db, service_id=service.id, branch_id=body.branch_id, at=now)
     claim = SlotClaim(
         user_id=user.id,
         consultant_id=consultant.id,
@@ -160,7 +151,7 @@ def create_appointment(
     db: Session = Depends(get_db),
 ):
     """Finalize an appointment from an active hold (B09)."""
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     expire_stale_holds(db)
 
     claim = db.get(SlotClaim, body.hold_id)
@@ -168,15 +159,16 @@ def create_appointment(
         return error_response("HOLD_NOT_FOUND", "نگهداری موقت یافت نشد", 404)
     if claim.status == "consumed":
         return error_response("HOLD_ALREADY_USED", "این نگهداری قبلا مصرف شده است", 409)
-        if claim.expires_at <= now:
+    if claim.expires_at <= now:
         return error_response("HOLD_EXPIRED", "مهلت نگهداری به پایان رسیده است", 409)
     if claim.status != "held":
         return error_response("HOLD_NOT_ACTIVE", "این نگهداری دیگر فعال نیست", 409)
 
+    service = db.get(Service, claim.service_id)
+    # consume FIRST so this very hold is not counted as an active overlap below
     claim.status = "consumed"
     db.commit()
-    # re-validate: calendar may have changed since the hold
-    service = db.get(Service, claim.service_id)
+
     err = validate_hold_window(
         db,
         service=service,
@@ -206,7 +198,6 @@ def create_appointment(
         status=status,
         price_snapshot=snapshot,
     )
-    claim.status = "consumed"
     db.add(appointment)
     try:
         db.commit()
@@ -270,13 +261,9 @@ def cancel_appointment(
     if a is None or a.user_id != user.id:
         return error_response("APPOINTMENT_NOT_FOUND", "نوبت یافت نشد", 404)
     if a.status not in CANCELLABLE:
-        return error_response(
-            "INVALID_TRANSITION",
-            f"لغو از وضعیت {a.status} مجاز نیست",
-            409,
-        )
+        return error_response("INVALID_TRANSITION", f"لغو از وضعیت {a.status} مجاز نیست", 409)
     a.status = "cancelled"
-    a.cancelled_at = datetime.now(timezone.utc)
+    a.cancelled_at = datetime.now(UTC)
     a.cancel_reason = (reason or "-")[:300]
     db.commit()
     write_audit(

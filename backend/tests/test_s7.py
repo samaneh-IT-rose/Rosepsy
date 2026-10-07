@@ -1,5 +1,4 @@
-from datetime import datetime, time, timedelta, timezone
-from uuid import UUID
+from datetime import UTC, datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
 from sqlalchemy import text
@@ -16,7 +15,7 @@ def _phone() -> str:
 
 
 def _next_monday() -> datetime:
-    today = datetime.now(timezone.utc).date()
+    today = datetime.now(UTC).date()
     days_ahead = (0 - today.weekday()) % 7
     days_ahead = days_ahead if days_ahead else 7
     return datetime.combine(today + timedelta(days=days_ahead), time(9, 0), tzinfo=TZ)
@@ -53,7 +52,7 @@ def _setup():
 
 
 def _utc(dt: datetime) -> str:
-    return dt.astimezone(timezone.utc).isoformat()
+    return dt.astimezone(UTC).isoformat()
 
 
 def _hold(hok, cid, sid, start: datetime, branch=None):
@@ -68,23 +67,18 @@ def _mk_user() -> tuple[str, dict]:
     return tok, h(tok)
 
 
-# ---------- holds ----------
-
-
 def test_hold_created_with_ttl():
     _, hok, cid, sid = _setup()
     r = _hold(hok, cid, sid, _next_monday())
     assert r.status_code == 201, r.text
-    data = r.json()["data"]
-    assert data["status"] if "status" in data else True
-    expires = datetime.fromisoformat(data["expires_at"])
-    ttl_seconds = (expires - datetime.now(timezone.utc)).total_seconds()
+    expires = datetime.fromisoformat(r.json()["data"]["expires_at"])
+    ttl_seconds = (expires - datetime.now(UTC)).total_seconds()
     assert 550 <= ttl_seconds <= 600  # ~10min TTL from request time
 
 
 def test_hold_outside_rules_rejected():
     _, hok, cid, sid = _setup()
-    off_window = _next_monday().replace(hour=20)  # rules are 09-12
+    off_window = _next_monday().replace(hour=20)
     r = _hold(hok, cid, sid, off_window)
     assert r.status_code == 409
     assert r.json()["errors"][0]["code"] == "SLOT_UNAVAILABLE"
@@ -135,13 +129,9 @@ def test_expired_hold_frees_slot():
     u2, h2 = _mk_user()
     again = _hold(h2, cid, sid, start)
     assert again.status_code == 201  # expired hold released the slot
-    # consuming the expired first hold fails
     v = client.post("/api/v1/appointments", json={"hold_id": first["id"]}, headers=hok)
     assert v.status_code == 409
     assert v.json()["errors"][0]["code"] == "HOLD_EXPIRED"
-
-
-# ---------- appointments ----------
 
 
 def test_free_service_appointment_is_confirmed():
@@ -152,7 +142,6 @@ def test_free_service_appointment_is_confirmed():
     assert a.status_code == 201, a.text
     assert a.json()["data"]["status"] == "confirmed"
     assert a.json()["data"]["price_snapshot"] is None
-    # hold consumed -> reuse fails
     again = client.post("/api/v1/appointments", json={"hold_id": hold["id"]}, headers=hok)
     assert again.status_code == 409
     assert again.json()["errors"][0]["code"] == "HOLD_ALREADY_USED"
@@ -168,7 +157,7 @@ def test_paid_service_appointment_pending_payment():
     )
     start = _next_monday()
     hold = _hold(hok, cid, sid, start).json()["data"]
-    assert hold["price_snapshot"]["amount"] == 4500000  # snapshot at hold time
+    assert hold["price_snapshot"]["amount"] == 4500000
     a = client.post("/api/v1/appointments", json={"hold_id": hold["id"]}, headers=hok)
     assert a.status_code == 201
     assert a.json()["data"]["status"] == "pending_payment"
@@ -215,8 +204,8 @@ def test_availability_subtracts_booked_appointment():
         headers=hok,
     ).json()["data"]["dates"]
     starts = [s["start"] for s in slots[monday]]
-    assert start.astimezone(timezone.utc).isoformat() not in starts
-    assert len(starts) == 3  # 09:00 taken, 09:45/10:30/10:15... 45min in 3h = 4 slots - 1 = 3
+    assert start.astimezone(UTC).isoformat() not in starts
+    assert len(starts) == 3  # 45min in 3h = 4 slots; 09:00 booked -> 3 remain
 
 
 def test_my_appointments_list():

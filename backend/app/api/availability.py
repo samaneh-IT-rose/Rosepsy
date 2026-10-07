@@ -1,5 +1,5 @@
 import uuid
-from datetime import date, datetime, time, timedelta, timezone
+from datetime import UTC, date, datetime, time, timedelta
 
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel, Field, model_validator
@@ -244,10 +244,9 @@ def free_slots(
     if service is None or not service.is_active:
         return error_response("SERVICE_NOT_FOUND", "خدمت یافت نشد یا غیرفعال است", 404)
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     expire_stale_holds(db)
-    today = now.date()
-    start_d = from_ or today
+    start_d = from_ or now.date()
     end_d = to or (start_d + timedelta(days=13))
     if end_d < start_d:
         return error_response("INVALID_RANGE", "بازه تاریخ نامعتبر است", 422)
