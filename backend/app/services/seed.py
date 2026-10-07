@@ -35,11 +35,14 @@ PERMISSIONS: list[tuple[str, str]] = [
     ("tariffs.manage", "مدیریت تعرفه‌ها و نسخه‌های قیمت"),
     ("topics.manage", "مدیریت دسته‌بندی موضوعی"),
     ("availability.manage", "مدیریت تقویم و دسترس‌پذیری"),
+    ("orders.read", "مشاهده سفارش‌ها"),
+    ("invoices.read", "مشاهده فاکتورها"),
 ]
 
 GRANTS: dict[str, list[str]] = {
     "reception": ["applicants.create", "applicants.read"],
     "consultant": ["availability.manage"],
+    "finance": ["orders.read", "invoices.read"],
     "system_admin": [
         "applicants.create",
         "applicants.read",
@@ -54,6 +57,8 @@ GRANTS: dict[str, list[str]] = {
         "tariffs.manage",
         "topics.manage",
         "availability.manage",
+        "orders.read",
+        "invoices.read",
     ],
 }
 
@@ -88,9 +93,7 @@ def seed_roles(db: Session) -> None:
                 )
             ).scalar_one_or_none()
             if link is None:
-                db.add(
-                    RolePermission(role_id=roles[role_name].id, permission_id=perms[code].id)
-                )
+                db.add(RolePermission(role_id=roles[role_name].id, permission_id=perms[code].id))
     db.commit()
 
 

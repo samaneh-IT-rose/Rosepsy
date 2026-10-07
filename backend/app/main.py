@@ -16,7 +16,9 @@ from app.api import (
     clinics,
     consultants,
     health,
+    invoices,
     me,
+    orders,
     pricing,
     roles,
     topics,
@@ -109,6 +111,8 @@ app.include_router(pricing.router, prefix=settings.API_V1_PREFIX)
 app.include_router(topics.router, prefix=settings.API_V1_PREFIX)
 app.include_router(availability.router, prefix=settings.API_V1_PREFIX)
 app.include_router(booking.router, prefix=settings.API_V1_PREFIX)
+app.include_router(orders.router, prefix=settings.API_V1_PREFIX)
+app.include_router(invoices.router, prefix=settings.API_V1_PREFIX)
 
 
 @app.get("/")

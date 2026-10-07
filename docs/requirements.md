@@ -332,3 +332,14 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - endpoint اسلات حالا نوبت‌ها و holdهای فعال را هم از دسترس‌پذیری کم می‌کند
 - ترمیم‌ها: compose بازنویسی تمیز، دو باگ تست s5، slots.py تمیز، scripts/db_sync.py برای هم‌ترازی alembic/create_all
 - D02 درگاه هنوز باز: در S8 آداپتور mock ساخته می‌شود
+
+---
+
+## 28) گام 12 — B10 + B11 پیاده‌سازی شد (اسپرینت S8)
+- مهاجرت 0008: finance.orders/payments/invoices/invoice_items + سکانس شماره فاکتور
+- B10: POST /orders با Idempotency-Key الزامی (تکرار همان کلید → همان سفارش، 200 + meta.idempotent_replay)؛ سفارش فقط از نوبت pending_payment با snapshot؛ سفارش فعال تکراری → 409
+- payments/start: آداپتور درگاه (MockGateway طبق D02 باز)؛ پرداخت فعال موازی → 409
+- payments/callback: بدون احراز هویت کاربر؛ allowlist IP قابل تنظیم (خالی=فقط dev)؛ تأیید با adapter سمت سرور؛ callback تکراری no-op (200 + noop) — قاعده صریح سند؛ success → order=paid + نوبت=confirmed + صدور فاکتور در همان تراکنش؛ failure → order=failed و امکان سفارش جدید
+- B11: فاکتور خودکار per paid order (idempotent)؛ شماره یکتا INV-{سال}-{سکانس}؛ مبلغ = snapshot سفارش؛ GET /invoices/{id} برای مالک یا نقش مالی؛ GET /invoices/{id}.pdf با PDF حداقلی بدون وابستگی (PDF فارسی به فاز UI موکول — تصمیم ثبت‌شده)
+- مجوزهای جدید: orders.read، invoices.read → finance + system_admin
+- ترمیم‌های این مرحله: باگ db_sync (heads)، B904، بازنویسی idempotent فایل‌های گام 11 (booking/availability/main/conftest انعطاف‌پذیر)
