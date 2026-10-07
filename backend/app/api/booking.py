@@ -82,7 +82,9 @@ def create_hold(
     if consultant is None:
         return error_response("CONSULTANT_NOT_FOUND", "مشاور یافت نشد", 404)
     if not consultant_is_bookable(db, consultant):
-        return error_response("CONSULTANT_NOT_BOOKABLE", "این مشاور در حال حاضر قابل رزرو نیست", 409)
+        return error_response(
+            "CONSULTANT_NOT_BOOKABLE", "این مشاور در حال حاضر قابل رزرو نیست", 409
+        )
     service = db.get(Service, body.service_id)
     if service is None or not service.is_active:
         return error_response("SERVICE_NOT_FOUND", "خدمت یافت نشد یا غیرفعال است", 404)

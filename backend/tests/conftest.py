@@ -66,6 +66,7 @@ def prepare_db():
         for schema in SCHEMAS:
             conn.execute(text('CREATE SCHEMA IF NOT EXISTS "' + schema + '"'))
         conn.execute(text("CREATE EXTENSION IF NOT EXISTS btree_gist"))
+        conn.execute(text("CREATE SEQUENCE IF NOT EXISTS finance.invoice_number_seq START 1"))
     import app.models  # noqa: F401
 
     Base.metadata.create_all(engine)
