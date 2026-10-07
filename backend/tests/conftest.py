@@ -12,7 +12,18 @@ from app.core.redis_client import get_redis
 from app.services.sms import get_sms_sender
 
 SCHEMAS = ["core", "booking", "clinical", "finance", "content", "edu", "audit"]
-CORE_TABLES = ["core.auth_sessions", "core.otp_challenges", "core.profiles", "core.users"]
+TABLES = [
+    "core.auth_sessions",
+    "core.user_roles",
+    "core.role_permissions",
+    "core.otp_challenges",
+    "core.applicants",
+    "core.profiles",
+    "core.users",
+    "core.roles",
+    "core.permissions",
+    "audit.audit_logs",
+]
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -28,8 +39,7 @@ def prepare_db():
 
 def _cleanup() -> None:
     with engine.begin() as conn:
-        for table in reversed(CORE_TABLES):
-            conn.execute(text("TRUNCATE TABLE " + table + " CASCADE"))
+        conn.execute(text("TRUNCATE TABLE " + ", ".join(TABLES) + " CASCADE"))
     redis = get_redis()
     for key in redis.scan_iter("rl:otp:*"):
         redis.delete(key)
