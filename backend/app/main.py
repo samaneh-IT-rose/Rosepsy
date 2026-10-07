@@ -1,4 +1,4 @@
-import logging
+﻿import logging
 import time
 import uuid
 from contextlib import asynccontextmanager
@@ -7,7 +7,18 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from app.api import applicants, auth, catalog, clinics, consultants, health, me, roles
+from app.api import (
+    applicants,
+    auth,
+    catalog,
+    clinics,
+    consultants,
+    health,
+    me,
+    pricing,
+    roles,
+    topics,
+)
 from app.api.schemas import envelope
 from app.core.config import settings
 from app.core.logging import request_id_var, setup_logging
@@ -92,6 +103,8 @@ app.include_router(roles.router, prefix=settings.API_V1_PREFIX)
 app.include_router(catalog.router, prefix=settings.API_V1_PREFIX)
 app.include_router(consultants.router, prefix=settings.API_V1_PREFIX)
 app.include_router(clinics.router, prefix=settings.API_V1_PREFIX)
+app.include_router(pricing.router, prefix=settings.API_V1_PREFIX)
+app.include_router(topics.router, prefix=settings.API_V1_PREFIX)
 
 
 @app.get("/")

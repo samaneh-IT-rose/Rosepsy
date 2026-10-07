@@ -1,4 +1,4 @@
-import os
+﻿import os
 
 os.environ.setdefault("DATABASE_URL", "postgresql+psycopg://roz:roz_dev@localhost:5432/roz")
 os.environ.setdefault("REDIS_URL", "redis://localhost:6379/0")
@@ -30,6 +30,9 @@ TABLES = [
     "core.branch_service_offerings",
     "core.branches",
     "core.clinics",
+    "core.tariff_versions",
+    "core.tariffs",
+    "core.topics",
     "audit.audit_logs",
 ]
 

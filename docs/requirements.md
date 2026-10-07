@@ -297,3 +297,14 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - برانچ‌اسکوپ عملیاتی شد: scoped_branch_ids در PATCH /branches/{id}؛ رد خارج‌از‌scope → 403 + audit
 - مجوزهای جدید: services.manage، consultants.read/manage/review، clinics.manage، branches.manage (system_admin)
 - حوادث محیطی: کانتینرها خاموش شده بودند (ConnectionTimeout) → با docker compose up ترمیم شد
+
+---
+
+## 25) گام 9 — B07 + B32 پیاده‌سازی شد (اسپرینت S5)
+- مهاجرت 0005: core.tariffs + core.tariff_versions + core.topics
+- B07: بازه نیمه‌باز [from, to)؛ هم‌پوشانی → 409 TARIFF_OVERLAP؛ مجاورت مجاز؛ نسخه باز با PATCH صریح بسته می‌شود (بستن دوباره → 409)؛ CheckConstraint بازه معتبر
+- /pricing/quote?at=... : snapshot قیمت در زمان دلخواه — مبنای سفارش S8 («قیمت گذشته تغییر نکند»)؛ تعرفه شعبه‌specific مقدم بر سراسری؛ فاقد تعرفه → 404
+- B32: درخت موضوع با جلوگیری چرخه (پیمایش اجداد) → 409 TOPIC_CYCLE؛ حذف فقط برگ بدون فرزند؛ غیرفعال‌سازی از public/topics حذف و سابقه حفظ می‌شود؛ /public/topics بدون احراز هویت
+- مجوزهای جدید: tariffs.manage، topics.manage (system_admin)؛ رد دسترسی‌ها audit می‌شود
+- محیط: compose با restart: unless-stopped به‌روز شد (ری‌استارت خودکار کانتینرها)
+- content_topics به B33 موکول شد (نیازمند جدول contents)
