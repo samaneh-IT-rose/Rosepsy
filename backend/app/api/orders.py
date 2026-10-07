@@ -211,7 +211,9 @@ def payments_callback(
     if payment is None:
         return error_response("PAYMENT_NOT_FOUND", "پرداخت یافت نشد", 404)
     if payment.status != "initiated":
-        return envelope(data={"payment_id": str(payment.id), "status": payment.status, "noop": True})
+        return envelope(
+            data={"payment_id": str(payment.id), "status": payment.status, "noop": True}
+        )
 
     gateway = get_gateway()
     ok, raw = gateway.verify(payload=body.model_dump())

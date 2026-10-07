@@ -59,18 +59,9 @@ def _invoice_data(db: Session, invoice: Invoice) -> dict:
     }
 
 
-@router.get("/invoices/{invoice_id}")
-def get_invoice(
-    invoice_id: uuid.UUID,
-    user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
-    invoice, order = _load(db, invoice_id)
-    if invoice is None or not _can_view(db, user, order):
-        return error_response("INVOICE_NOT_FOUND", "فاکتور یافت نشد", 404)
-    return envelope(data=_invoice_data(db, invoice))
-
-
+# NOTE: the .pdf route MUST be registered BEFORE "/invoices/{invoice_id}".
+# The generic pattern captures any non-slash segment (including "xxx.pdf")
+# and would fail UUID parsing with 422 before the .pdf route is reached.
 @router.get("/invoices/{invoice_id}.pdf")
 def get_invoice_pdf(
     invoice_id: uuid.UUID,
@@ -95,3 +86,15 @@ def get_invoice_pdf(
         media_type="application/pdf",
         headers={"Content-Disposition": f'inline; filename="{invoice.invoice_number}.pdf"'},
     )
+
+
+@router.get("/invoices/{invoice_id}")
+def get_invoice(
+    invoice_id: uuid.UUID,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    invoice, order = _load(db, invoice_id)
+    if invoice is None or not _can_view(db, user, order):
+        return error_response("INVOICE_NOT_FOUND", "فاکتور یافت نشد", 404)
+    return envelope(data=_invoice_data(db, invoice))
