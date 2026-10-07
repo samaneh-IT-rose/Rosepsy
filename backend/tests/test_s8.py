@@ -69,9 +69,7 @@ def _pending_appointment(hok, cid, sid) -> dict:
         json={"consultant_id": cid, "service_id": sid, "start_at": _utc(_next_monday())},
         headers=hok,
     ).json()["data"]
-    appt = client.post(
-        "/api/v1/appointments", json={"hold_id": hold["id"]}, headers=hok
-    )
+    appt = client.post("/api/v1/appointments", json={"hold_id": hold["id"]}, headers=hok)
     assert appt.status_code == 201, appt.text
     return appt.json()["data"]
 
@@ -82,6 +80,12 @@ def _mk_order(hok, appt_id: str, key: str):
         json={"appointment_id": appt_id},
         headers={**hok, "Idempotency-Key": key},
     )
+
+
+def _start(hok, order_id: str) -> dict:
+    r = client.post("/api/v1/payments/start", json={"order_id": order_id}, headers=hok)
+    assert r.status_code == 200, r.text
+    return r.json()["data"]
 
 
 def _callback(hok, gateway_ref: str, result: str):
@@ -130,14 +134,17 @@ def test_order_for_foreign_appointment_404():
 
 def test_order_for_non_pending_appointment_409():
     _, hok, cid, sid = _setup_paid()
-    # a free service appointment is confirmed immediately -> not payable
     sid_free = client.post(
         "/api/v1/services", json={"name": "خدمت رایگان", "duration_minutes": 30},
         headers=hok,
     ).json()["data"]["id"]
     hold = client.post(
         "/api/v1/booking-holds",
-        json={"consultant_id": cid, "service_id": sid_free, "start_at": _utc(_next_monday().replace(hour=11))},
+        json={
+            "consultant_id": cid,
+            "service_id": sid_free,
+            "start_at": _utc(_next_monday().replace(hour=11)),
+        },
         headers=hok,
     ).json()["data"]
     appt = client.post(
@@ -162,11 +169,7 @@ def test_payment_start_initiates_once():
     _, hok, cid, sid = _setup_paid()
     appt = _pending_appointment(hok, cid, sid)
     order = _mk_order(hok, appt["id"], "key-6").json()["data"]
-    r = client.post(
-        "/api/v1/payments/start", json={"order_id": order["id"]}, headers=hok
-    )
-    assert r.status_code == 200, r.text
-    data = r.json()["data"]
+    data = _start(hok, order["id"])
     assert data["gateway_ref"].startswith("mock-")
     assert "/mock-gateway/pay" in data["redirect_url"]
     again = client.post(
@@ -180,9 +183,7 @@ def test_callback_success_full_flow():
     _, hok, cid, sid = _setup_paid()
     appt = _pending_appointment(hok, cid, sid)
     order = _mk_order(hok, appt["id"], "key-7").json()["data"]
-    start = client.post(
-        "/api/v1/payments/start", json={"order_id": order["id"]}, headers=hok
-    ).json()["data"]
+    start = _start(hok, order["id"])
     cb = _callback(hok, start["gateway_ref"], "success")
     assert cb.status_code == 200, cb.text
     data = cb.json()["data"]
@@ -202,9 +203,7 @@ def test_repeated_callback_noop():
     _, hok, cid, sid = _setup_paid()
     appt = _pending_appointment(hok, cid, sid)
     order = _mk_order(hok, appt["id"], "key-8").json()["data"]
-    start = client.post(
-        "/api/v1/payments/start", json={"order_id": order["id"]}, headers=hok
-    ).json()["data"]
+    start = _start(hok, order["id"])
     first = _callback(hok, start["gateway_ref"], "success")
     assert first.json()["data"]["noop"] is False
     second = _callback(hok, start["gateway_ref"], "success")
@@ -219,17 +218,12 @@ def test_callback_failure_then_new_order():
     _, hok, cid, sid = _setup_paid()
     appt = _pending_appointment(hok, cid, sid)
     order = _mk_order(hok, appt["id"], "key-9").json()["data"]
-    start = client.post(
-        "/api/v1/payments/start", json={"order_id": order["id"]}, headers=hok
-    ).json()["data"]
+    start = _start(hok, order["id"])
     fail = _callback(hok, start["gateway_ref"], "failure")
     assert fail.json()["data"]["order_status"] == "failed"
-    # failed order is not blocking -> a new order can be created and succeed
     order2 = _mk_order(hok, appt["id"], "key-9b")
     assert order2.status_code == 201, order2.text
-    start2 = client.post(
-        "/api/v1/payments/start", json={"order_id": order2.json()["data"]["id"]}, headers=hok
-    ).json()["data"]
+    start2 = _start(hok, order2.json()["data"]["id"])
     ok = _callback(hok, start2["gateway_ref"], "success")
     assert ok.json()["data"]["order_status"] == "paid"
 
@@ -238,9 +232,7 @@ def test_invoice_visibility_matrix():
     _, hok, cid, sid = _setup_paid()
     appt = _pending_appointment(hok, cid, sid)
     order = _mk_order(hok, appt["id"], "key-10").json()["data"]
-    start = client.post(
-        "/api/v1/payments/start", json={"order_id": order["id"]}, headers=hok
-    ).json()["data"]
+    start = _start(hok, order["id"])
     invoice_id = _callback(hok, start["gateway_ref"], "success").json()["data"]["invoice_id"]
 
     owner = client.get(f"/api/v1/invoices/{invoice_id}", headers=hok)
@@ -259,9 +251,7 @@ def test_invoice_pdf_content_type():
     _, hok, cid, sid = _setup_paid()
     appt = _pending_appointment(hok, cid, sid)
     order = _mk_order(hok, appt["id"], "key-11").json()["data"]
-    start = client.post(
-        "/api/v1/payments/start", json={"order_id": order["id"]}, headers=hok
-    ).json()["data"]
+    start = _start(hok, order["id"])
     invoice_id = _callback(hok, start["gateway_ref"], "success").json()["data"]["invoice_id"]
     pdf = client.get(f"/api/v1/invoices/{invoice_id}.pdf", headers=hok)
     assert pdf.status_code == 200
@@ -273,9 +263,7 @@ def test_payment_start_on_paid_order_409():
     _, hok, cid, sid = _setup_paid()
     appt = _pending_appointment(hok, cid, sid)
     order = _mk_order(hok, appt["id"], "key-12").json()["data"]
-    start = client.post(
-        "/api/v1/payments/start", json={"order_id": order["id"]}, headers=hok
-    ).json()["data"]
+    start = _start(hok, order["id"])
     _callback(hok, start["gateway_ref"], "success")
     again = client.post(
         "/api/v1/payments/start", json={"order_id": order["id"]}, headers=hok

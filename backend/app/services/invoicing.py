@@ -2,7 +2,7 @@
 
 from datetime import UTC, datetime
 
-from sqlalchemy import text
+from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
 from app.models.booking import Appointment
@@ -11,6 +11,8 @@ from app.models.finance import Invoice, InvoiceItem, Order
 
 
 def next_invoice_number(db: Session) -> str:
+    # self-healing: guarantees the sequence even if the migration went the stamp path
+    db.execute(text("CREATE SEQUENCE IF NOT EXISTS finance.invoice_number_seq START 1"))
     seq = db.execute(text("SELECT nextval('finance.invoice_number_seq')")).scalar_one()
     year = datetime.now(UTC).year
     return f"INV-{year}-{seq:06d}"
@@ -19,7 +21,7 @@ def next_invoice_number(db: Session) -> str:
 def create_invoice_for_order(db: Session, order: Order) -> Invoice:
     """Idempotent: returns the existing invoice if the order already has one."""
     existing = db.execute(
-        select(Invoice).where(Invoice.order_id == order.id)  # noqa: F821
+        select(Invoice).where(Invoice.order_id == order.id)
     ).scalar_one_or_none()
     if existing is not None:
         return existing
@@ -50,6 +52,3 @@ def create_invoice_for_order(db: Session, order: Order) -> Invoice:
         )
     )
     return invoice
-
-
-from sqlalchemy import select  # noqa: E402  (kept last to avoid circulars in dev)

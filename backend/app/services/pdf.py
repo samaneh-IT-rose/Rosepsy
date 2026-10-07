@@ -1,8 +1,7 @@
 """Minimal dependency-free single-page PDF (Helvetica, Latin-1).
 
 Persian glyphs are not rendered by the base-14 fonts; the Persian-formatted
-invoice PDF is deferred to the UI phase (documented decision). Numbers and
-codes (invoice number, amount, dates) are ASCII-safe.
+invoice PDF is deferred to the UI phase (documented decision).
 """
 
 

@@ -94,7 +94,9 @@ def create_order(
     ).scalar_one_or_none()
     if active is not None:
         return error_response(
-            "ORDER_EXISTS", "برای این نوبت سفارش فعال وجود دارد", 409,
+            "ORDER_EXISTS",
+            "برای این نوبت سفارش فعال وجود دارد",
+            409,
             details={"order_id": str(active.id)},
         )
 
@@ -157,9 +159,7 @@ def start_payment(
         return error_response("PAYMENT_IN_PROGRESS", "یک پرداخت فعال برای این سفارش وجود دارد", 409)
 
     gateway = get_gateway()
-    ref, url = gateway.start(
-        order_id=order.id, amount=int(order.amount), currency=order.currency
-    )
+    ref, url = gateway.start(order_id=order.id, amount=int(order.amount), currency=order.currency)
     payment = Payment(
         order_id=order.id,
         gateway=gateway.name,
@@ -209,13 +209,7 @@ def payments_callback(
     if payment is None:
         return error_response("PAYMENT_NOT_FOUND", "پرداخت یافت نشد", 404)
     if payment.status != "initiated":
-        return envelope(
-            data={
-                "payment_id": str(payment.id),
-                "status": payment.status,
-                "noop": True,
-            }
-        )
+        return envelope(data={"payment_id": str(payment.id), "status": payment.status, "noop": True})
 
     gateway = get_gateway()
     ok, raw = gateway.verify(payload=body.model_dump())

@@ -2,6 +2,7 @@ import uuid
 
 from fastapi import APIRouter, Depends
 from fastapi.responses import Response
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
@@ -31,9 +32,12 @@ def _can_view(db: Session, user: User, order: Order | None) -> bool:
 
 def _invoice_data(db: Session, invoice: Invoice) -> dict:
     items = (
-        db.query(InvoiceItem)
-        .filter(InvoiceItem.invoice_id == invoice.id)
-        .order_by(InvoiceItem.id)
+        db.execute(
+            select(InvoiceItem)
+            .where(InvoiceItem.invoice_id == invoice.id)
+            .order_by(InvoiceItem.id)
+        )
+        .scalars()
         .all()
     )
     return {

@@ -1,5 +1,5 @@
-"""Payment gateway adapter (B10). D02 is open: MockGateway now; real provider
-(Zarinpal/IDPay/...) plugs in behind the same interface later."""
+"""Payment gateway adapter (B10). D02 is open: MockGateway now; a real
+provider (Zarinpal/IDPay/...) plugs in behind the same interface later."""
 
 import uuid
 from abc import ABC, abstractmethod
