@@ -1,4 +1,4 @@
-﻿from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
 from tests.helpers import client, denied_count, grant, h, login
@@ -49,7 +49,7 @@ def test_tariff_and_open_version_created():
     tid = _mk_tariff(hok, sid)
     v = client.post(
         f"/api/v1/tariffs/{tid}/versions",
-        json={"amount": 4500000, "valid_from": _iso(datetime.now(timezone.utc) - timedelta(days=1))},
+        json={"amount": 4500000, "valid_from": _iso(datetime.now(UTC) - timedelta(days=1))},
         headers=hok,
     )
     assert v.status_code == 201, v.text
@@ -63,7 +63,7 @@ def test_overlapping_version_rejected():
     hok = h(token)
     sid = _mk_service(hok)
     tid = _mk_tariff(hok, sid)
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     first = client.post(
         f"/api/v1/tariffs/{tid}/versions",
         json={
@@ -88,7 +88,7 @@ def test_adjacent_version_allowed():
     hok = h(token)
     sid = _mk_service(hok)
     tid = _mk_tariff(hok, sid)
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     boundary = now + timedelta(days=5)
     v1 = client.post(
         f"/api/v1/tariffs/{tid}/versions",
@@ -113,7 +113,7 @@ def test_invalid_version_range_rejected():
     hok = h(token)
     sid = _mk_service(hok)
     tid = _mk_tariff(hok, sid)
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     resp = client.post(
         f"/api/v1/tariffs/{tid}/versions",
         json={
@@ -132,7 +132,7 @@ def test_quote_snapshot_semantics():
     hok = h(token)
     sid = _mk_service(hok)
     tid = _mk_tariff(hok, sid)
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     v1 = client.post(
         f"/api/v1/tariffs/{tid}/versions",
         json={"amount": 4500000, "valid_from": _iso(now - timedelta(days=2))},
@@ -157,7 +157,7 @@ def test_quote_snapshot_semantics():
     )
     assert q_now.status_code == 200
     assert q_now.json()["data"]["amount"] == 4500000
-    assert q_now.json()["data"]["version_id"] == v1["id"]
+    assert q_now.json()["data"]["id"] == v1["id"]
 
     q_future = client.get(
         "/api/v1/pricing/quote",
@@ -185,7 +185,7 @@ def test_close_enables_successor_and_double_close_rejected():
     hok = h(token)
     sid = _mk_service(hok)
     tid = _mk_tariff(hok, sid)
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     v1 = client.post(
         f"/api/v1/tariffs/{tid}/versions",
         json={"amount": 100000, "valid_from": _iso(now - timedelta(days=1))},
@@ -261,11 +261,11 @@ def test_topic_cycle_rejected():
     token, _ = grant(_phone(), "system_admin")
     hok = h(token)
     a = client.post(
-        "/api/v1/topics", json={"name": "A", "slug": "cyc-a"}, headers=hok
+        "/api/v1/topics", json={"name": "آلفا", "slug": "cyc-a"}, headers=hok
     ).json()["data"]
     b = client.post(
         "/api/v1/topics",
-        json={"name": "B", "slug": "cyc-b", "parent_id": a["id"]},
+        json={"name": "بتا", "slug": "cyc-b", "parent_id": a["id"]},
         headers=hok,
     ).json()["data"]
     to_child = client.patch(f"/api/v1/topics/{a['id']}", json={"parent_id": b["id"]}, headers=hok)

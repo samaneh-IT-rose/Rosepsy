@@ -1,6 +1,6 @@
-﻿import uuid
+import uuid
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -197,7 +197,12 @@ def public_topics(db: Session = Depends(get_db)):
     )
     return envelope(
         data=[
-            {"id": str(t.id), "name": t.name, "slug": t.slug, "parent_id": str(t.parent_id) if t.parent_id else None}
+            {
+                "id": str(t.id),
+                "name": t.name,
+                "slug": t.slug,
+                "parent_id": str(t.parent_id) if t.parent_id else None,
+            }
             for t in rows
         ]
     )

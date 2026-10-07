@@ -1,9 +1,9 @@
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime
 
 from app.services.slots import generate_slots
 
 TZ = "Asia/Tehran"
-FAKE_NOW = datetime(2025, 6, 10, 12, 0, tzinfo=timezone.utc)  # a Tuesday
+FAKE_NOW = datetime(2025, 6, 10, 12, 0, tzinfo=UTC)  # a Tuesday
 
 
 def test_two_fitting_slots_in_90min_window():
@@ -40,8 +40,8 @@ def test_exception_splits_window():
         rules=[(0, __import__("datetime").time(9, 0), __import__("datetime").time(12, 0))],
         exceptions=[
             (
-                datetime(2025, 6, 16, 6, 30, tzinfo=timezone.utc),   # 10:00 local
-                datetime(2025, 6, 16, 7, 30, tzinfo=timezone.utc),   # 11:00 local
+                datetime(2025, 6, 16, 6, 30, tzinfo=UTC),   # 10:00 local
+                datetime(2025, 6, 16, 7, 30, tzinfo=UTC),   # 11:00 local
             )
         ],
         duration_minutes=60,
@@ -57,7 +57,7 @@ def test_exception_splits_window():
 
 def test_past_slots_dropped():
     # fake now = Monday 09:30 local -> 06:00 UTC
-    now = datetime(2025, 6, 16, 6, 0, tzinfo=timezone.utc)
+    now = datetime(2025, 6, 16, 6, 0, tzinfo=UTC)
     slots = generate_slots(
         rules=[(0, __import__("datetime").time(9, 0), __import__("datetime").time(10, 30))],
         exceptions=[],
@@ -76,8 +76,8 @@ def test_full_day_leave_empties_date():
         rules=[(0, __import__("datetime").time(9, 0), __import__("datetime").time(17, 0))],
         exceptions=[
             (
-                datetime(2025, 6, 15, 20, 30, tzinfo=timezone.utc),  # Mon 00:00 local
-                datetime(2025, 6, 16, 20, 30, tzinfo=timezone.utc),  # Tue 00:00 local
+                datetime(2025, 6, 15, 20, 30, tzinfo=UTC),  # Mon 00:00 local
+                datetime(2025, 6, 16, 20, 30, tzinfo=UTC),  # Tue 00:00 local
             )
         ],
         duration_minutes=60,

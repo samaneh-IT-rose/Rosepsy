@@ -112,9 +112,7 @@ def create_service(
 @router.get("/services")
 def list_services(
     include_inactive: bool = False,
-    user: User = Depends(require_permission("services.manage"))
-    if False
-    else Depends(get_current_user),  # noqa: E501 - see below
+    user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """Active services by default; inactive only for services.manage holders."""

@@ -1,5 +1,5 @@
 import uuid
-from datetime import date, datetime, time, timedelta, timezone
+from datetime import UTC, date, datetime, time, timedelta
 
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel, Field, model_validator
@@ -138,7 +138,7 @@ def put_rules(
         by_day.setdefault(r.weekday, []).append(r)
     for weekday, rules in by_day.items():
         ordered = sorted(rules, key=lambda r: r.start_time)
-        for prev, nxt in zip(ordered, ordered[1:]):
+        for prev, nxt in zip(ordered, ordered[1:], strict=False):
             if nxt.start_time < prev.end_time:
                 return error_response(
                     "OVERLAPPING_RULES", f"پنجره‌های هم‌پوشان در روز هفته {weekday}", 409
@@ -243,7 +243,7 @@ def free_slots(
     if service is None or not service.is_active:
         return error_response("SERVICE_NOT_FOUND", "خدمت یافت نشد یا غیرفعال است", 404)
 
-    today = datetime.now(timezone.utc).date()
+    today = datetime.now(UTC).date()
     start_d = from_ or today
     end_d = to or (start_d + timedelta(days=13))
     if end_d < start_d:
@@ -276,7 +276,7 @@ def free_slots(
         exceptions=exceptions,
         duration_minutes=service.duration_minutes,
         tz_name=settings.AVAILABILITY_TIMEZONE,
-        now=datetime.now(timezone.utc),
+        now=datetime.now(UTC),
         from_date=start_d,
         to_date=end_d,
     )

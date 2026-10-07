@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
@@ -44,7 +44,7 @@ def _is_eligible(db: Session, consultant: Consultant) -> bool:
     """approved status AND at least one verified, unexpired credential (spec B05)."""
     if consultant.status != "approved":
         return False
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     stmt = (
         select(Credential.id)
         .where(
@@ -58,7 +58,7 @@ def _is_eligible(db: Session, consultant: Consultant) -> bool:
 
 
 def _eligible_condition():
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     return and_(
         Consultant.status == "approved",
         exists().where(

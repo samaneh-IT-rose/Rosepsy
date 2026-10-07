@@ -1,7 +1,6 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
-from app.core.db import SessionLocal
 from tests.helpers import client, denied_count, grant, grant_scoped, h, login
 
 PHONE = iter(range(9141140000, 9141149999))
@@ -78,7 +77,7 @@ def test_credential_approval_makes_consultant_bookable():
             "kind": "license",
             "title": "پروانه نظام روان‌شناسی",
             "license_number": "LIC-1001",
-            "expires_at": (datetime.now(timezone.utc) + timedelta(days=365)).isoformat(),
+            "expires_at": (datetime.now(UTC) + timedelta(days=365)).isoformat(),
         },
         headers=hok,
     )
@@ -126,7 +125,7 @@ def test_expired_credential_makes_consultant_unbookable():
             "kind": "license",
             "title": "پروانه منقضی",
             "license_number": "LIC-EXP",
-            "expires_at": (datetime.now(timezone.utc) - timedelta(days=1)).isoformat(),
+            "expires_at": (datetime.now(UTC) - timedelta(days=1)).isoformat(),
         },
         headers=hok,
     ).json()["data"]["id"]
@@ -247,7 +246,7 @@ def test_branch_shows_only_offered_and_active_services():
         "/api/v1/services", json={"name": "جلسه فردی", "duration_minutes": 45},
         headers=hok,
     ).json()["data"]["id"]
-    s2 = client.post(
+    client.post(
         "/api/v1/services", json={"name": "جلسه خانواده", "duration_minutes": 60},
         headers=hok,
     ).json()["data"]["id"]

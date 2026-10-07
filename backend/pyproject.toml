@@ -6,11 +6,16 @@ target-version = "py312"
 select = ["E", "F", "I", "UP", "B"]
 
 [tool.ruff.lint.flake8-bugbear]
-# B008: Depends() in defaults is the canonical FastAPI DI pattern.
-extend-immutable-calls = ["fastapi.Depends"]
+# B008: Depends()/Query()/require_permission() in defaults = canonical FastAPI DI
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.Query",
+    "app.api.permissions.require_permission",
+]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/conftest.py" = ["E402"]
+"alembic/versions/*" = ["I001", "E501"]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

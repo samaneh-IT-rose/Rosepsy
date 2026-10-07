@@ -1,16 +1,19 @@
 """Pure slot generation (B08) - deterministic and unit-testable.
 
-Rules are local wall-clock windows per ISO weekday; they are materialized to
-UTC with the configured clinic timezone. Blocking exceptions (UTC windows) are
-subtracted first; then slots of the service duration are laid from each free
-window start. Slots starting before `now` are dropped.
+Weekly rules are local wall-clock windows per ISO weekday; they are
+materialized to UTC with the configured clinic timezone. Blocking exceptions
+(UTC windows) are subtracted first; then slots of the service duration are
+laid from each free window start. Slots starting before `now` are dropped.
 """
 
-from datetime import date, datetime, timedelta
+from datetime import UTC, date, datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
 
-def _subtract(intervals: list[tuple[datetime, datetime]], blocks: list[tuple[datetime, datetime]]):
+def _subtract(
+    intervals: list[tuple[datetime, datetime]],
+    blocks: list[tuple[datetime, datetime]],
+) -> list[tuple[datetime, datetime]]:
     result = intervals
     for b_start, b_end in blocks:
         nxt: list[tuple[datetime, datetime]] = []
@@ -28,8 +31,8 @@ def _subtract(intervals: list[tuple[datetime, datetime]], blocks: list[tuple[dat
 
 def generate_slots(
     *,
-    rules: list[tuple[int, time, time]],  # (weekday, start_time, end_time)
-    exceptions: list[tuple[datetime, datetime]],  # UTC pairs
+    rules: list[tuple[int, time, time]],
+    exceptions: list[tuple[datetime, datetime]],
     duration_minutes: int,
     tz_name: str,
     now: datetime,
@@ -47,14 +50,8 @@ def generate_slots(
         for weekday, r_start, r_end in rules:
             if weekday != day.weekday() or r_end <= r_start:
                 continue
-            start_utc = datetime.combine(day, r_start, tzinfo=tz).astimezone(
-                datetime.now().astimezone().tzinfo or __import__("datetime").timezone.utc
-            ) if False else datetime.combine(day, r_start, tzinfo=tz).astimezone(
-                __import__("datetime").timezone.utc
-            )
-            end_utc = datetime.combine(day, r_end, tzinfo=tz).astimezone(
-                __import__("datetime").timezone.utc
-            )
+            start_utc = datetime.combine(day, r_start, tzinfo=tz).astimezone(UTC)
+            end_utc = datetime.combine(day, r_end, tzinfo=tz).astimezone(UTC)
             windows.append((start_utc, end_utc))
 
         free = _subtract(windows, exceptions)
@@ -64,10 +61,7 @@ def generate_slots(
             while cursor + duration <= e:
                 if cursor >= now:
                     slots.append(
-                        {
-                            "start": cursor.isoformat(),
-                            "end": (cursor + duration).isoformat(),
-                        }
+                        {"start": cursor.isoformat(), "end": (cursor + duration).isoformat()}
                     )
                 cursor += duration
         if slots:

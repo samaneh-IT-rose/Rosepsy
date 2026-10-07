@@ -1,5 +1,5 @@
 ﻿import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel, Field, model_validator
@@ -213,7 +213,7 @@ def quote(
 
     Branch-specific tariff wins over the service-global one.
     """
-    at = at or datetime.now(timezone.utc)
+    at = at or datetime.now(UTC)
     tariff = None
     if branch_id is not None:
         tariff = db.execute(

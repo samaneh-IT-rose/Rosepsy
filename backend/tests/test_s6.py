@@ -1,4 +1,4 @@
-from datetime import date, datetime, time, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 from uuid import UUID
 
 from tests.helpers import client, denied_count, grant, h, login
@@ -11,7 +11,7 @@ def _phone() -> str:
 
 
 def _next_monday() -> date:
-    today = datetime.now(timezone.utc).date()
+    today = datetime.now(UTC).date()
     days_ahead = (0 - today.weekday()) % 7
     return today + timedelta(days=days_ahead if days_ahead else 7)
 

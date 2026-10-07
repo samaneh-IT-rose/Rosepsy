@@ -4,7 +4,6 @@ services:
   db:
     image: postgres:16-alpine
     restart: unless-stopped
-    restart: unless-stopped
     environment:
       POSTGRES_DB: roz
       POSTGRES_USER: roz
@@ -21,7 +20,6 @@ services:
 
   redis:
     image: redis:7-alpine
-    restart: unless-stopped
     restart: unless-stopped
     ports:
       - "6379:6379"

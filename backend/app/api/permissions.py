@@ -4,7 +4,6 @@ Rule from the spec: unauthorized access must be REJECTED and RECORDED at the
 API level - hiding UI buttons is not sufficient.
 """
 
-import uuid
 
 from fastapi import Depends, HTTPException, Request
 from sqlalchemy.orm import Session
