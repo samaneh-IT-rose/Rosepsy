@@ -320,3 +320,15 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - مالکیت تقویم: مشاور فقط خودش، system_admin همه؛ رد → 403 + audit
 - سرویس غیرفعال → 404 برای query اسلات؛ کسر نوبت‌های رزروشده در B09/S7 به همان تابع خالص اضافه می‌شود
 - محیط: scripts/env-check.ps1 ساخته شد (Docker check + compose up + pytest) — همیشه قبل از کار اجرا شود
+
+---
+
+## 27) گام 11 — B09 پیاده‌سازی شد (اسپرینت S7)
+- مهاجرت 0007: booking.slot_claims + booking.appointments + CREATE EXTENSION btree_gist + دو Exclusion Constraint (منع تعارض در سطح DB — «دو رزرو ناسازگار قطعی نشوند»)
+- Hold با TTL=10min (قابل تنظیم)، snapshot قیمت لحظه hold، مصرف یک‌بار، انقضای lazy (expired → آزاد)
+- نوبت از hold: بدون قیمت/صفر → confirmed (نوبت قطعی رایگان طبق BPMN فرایند 01)؛ با قیمت → pending_payment
+- اعتبارسنجی سه‌لایه: پنجره تقویم (rules−exceptions) → تداخل با hold/نوبت فعال → Exclusion Constraint به‌عنوان حصار نهایی
+- لغو فقط از pending_payment/confirmed؛ وضعیت‌های State Machine سند
+- endpoint اسلات حالا نوبت‌ها و holdهای فعال را هم از دسترس‌پذیری کم می‌کند
+- ترمیم‌ها: compose بازنویسی تمیز، دو باگ تست s5، slots.py تمیز، scripts/db_sync.py برای هم‌ترازی alembic/create_all
+- D02 درگاه هنوز باز: در S8 آداپتور mock ساخته می‌شود

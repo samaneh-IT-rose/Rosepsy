@@ -1,5 +1,5 @@
 import uuid
-from datetime import UTC, date, datetime, time, timedelta
+from datetime import date, datetime, time, timedelta, timezone
 
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel, Field, model_validator
@@ -16,6 +16,7 @@ from app.models.availability import AvailabilityException, WeeklyRule
 from app.models.catalog import Consultant, Service
 from app.models.core import User
 from app.services.authz import has_permission, write_audit
+from app.services.booking import active_blocks, expire_stale_holds
 from app.services.slots import generate_slots
 
 router = APIRouter(tags=["availability"])
@@ -235,7 +236,7 @@ def free_slots(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Free slots for a service over a date range (contract: /consultants/{id}/availability)."""
+    """Free slots for a service; bookings and active holds are subtracted (B08+B09)."""
     consultant, err = _consultant_or_404(db, consultant_id)
     if err:
         return err
@@ -243,7 +244,9 @@ def free_slots(
     if service is None or not service.is_active:
         return error_response("SERVICE_NOT_FOUND", "خدمت یافت نشد یا غیرفعال است", 404)
 
-    today = datetime.now(UTC).date()
+    now = datetime.now(timezone.utc)
+    expire_stale_holds(db)
+    today = now.date()
     start_d = from_ or today
     end_d = to or (start_d + timedelta(days=13))
     if end_d < start_d:
@@ -261,22 +264,12 @@ def free_slots(
         .scalars()
         .all()
     ]
-    exceptions = [
-        (x.start_at, x.end_at)
-        for x in db.execute(
-            select(AvailabilityException).where(
-                AvailabilityException.consultant_id == consultant_id
-            )
-        )
-        .scalars()
-        .all()
-    ]
     result = generate_slots(
         rules=rules,
-        exceptions=exceptions,
+        exceptions=active_blocks(db, consultant_id),
         duration_minutes=service.duration_minutes,
         tz_name=settings.AVAILABILITY_TIMEZONE,
-        now=datetime.now(UTC),
+        now=now,
         from_date=start_d,
         to_date=end_d,
     )

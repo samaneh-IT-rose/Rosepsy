@@ -1,5 +1,6 @@
 from app.models.audit import AuditLog  # noqa: F401
 from app.models.availability import AvailabilityException, WeeklyRule  # noqa: F401
+from app.models.booking import Appointment, SlotClaim  # noqa: F401
 from app.models.catalog import (  # noqa: F401
     Consultant,
     Credential,

@@ -13,6 +13,8 @@ from app.services.sms import get_sms_sender
 
 SCHEMAS = ["core", "booking", "clinical", "finance", "content", "edu", "audit"]
 TABLES = [
+    "booking.appointments",
+    "booking.slot_claims",
     "booking.availability_exceptions",
     "booking.availability_weekly_rules",
     "core.auth_sessions",
@@ -38,15 +40,38 @@ TABLES = [
     "audit.audit_logs",
 ]
 
+EXCLUSION_CONSTRAINTS = [
+    (
+        "ex_booking_slot_claims_active",
+        "ALTER TABLE booking.slot_claims ADD CONSTRAINT ex_booking_slot_claims_active "
+        "EXCLUDE USING gist (consultant_id WITH =, tstzrange(start_at, end_at, '[)') WITH &&) "
+        "WHERE (status = 'held')",
+    ),
+    (
+        "ex_booking_appointments_active",
+        "ALTER TABLE booking.appointments ADD CONSTRAINT ex_booking_appointments_active "
+        "EXCLUDE USING gist (consultant_id WITH =, tstzrange(start_at, end_at, '[)') WITH &&) "
+        "WHERE (status IN ('pending_payment', 'confirmed', 'in_progress'))",
+    ),
+]
+
 
 @pytest.fixture(scope="session", autouse=True)
 def prepare_db():
     with engine.begin() as conn:
         for schema in SCHEMAS:
             conn.execute(text('CREATE SCHEMA IF NOT EXISTS "' + schema + '"'))
+        conn.execute(text("CREATE EXTENSION IF NOT EXISTS btree_gist"))
     import app.models  # noqa: F401  (register tables on metadata)
 
     Base.metadata.create_all(engine)
+    with engine.begin() as conn:
+        for name, ddl in EXCLUSION_CONSTRAINTS:
+            exists = conn.execute(
+                text("SELECT 1 FROM pg_constraint WHERE conname = :n"), {"n": name}
+            ).scalar()
+            if not exists:
+                conn.execute(text(ddl))
     yield
 
 
