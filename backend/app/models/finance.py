@@ -23,7 +23,7 @@ class Order(Base):
         Uuid, ForeignKey("core.users.id", ondelete="CASCADE"), index=True
     )
     appointment_id: Mapped[uuid.UUID | None] = mapped_column(
-        Uuid, ForeignKey("booking.appointments.id", ondelete="SET NULL"), unique=True
+        Uuid, ForeignKey("booking.appointments.id", ondelete="SET NULL")
     )
     order_type: Mapped[str] = mapped_column(String(20), default="appointment")
     amount: Mapped[int] = mapped_column(Numeric(14, 0))

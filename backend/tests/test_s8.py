@@ -274,6 +274,6 @@ def test_payment_start_on_paid_order_409():
 
 def test_callback_ip_allowlist_blocks(monkeypatch):
     monkeypatch.setattr(settings, "PAYMENT_CALLBACK_ALLOWLIST", "10.99.99.99")
-    resp = _callback(h({}), "mock-nonexistent", "success")
+    resp = _callback({}, "mock-nonexistent", "success")
     assert resp.status_code == 403
     assert resp.json()["errors"][0]["code"] == "FORBIDDEN"

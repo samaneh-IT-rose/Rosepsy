@@ -354,3 +354,14 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - B11: فاکتور خودکار per paid order (idempotent)؛ شماره یکتا INV-{سال}-{سکانس}؛ مبلغ = snapshot سفارش؛ دسترسی مالک یا مالی؛ PDF حداقلی بدون وابستگی (PDF فارسی به فاز UI موکول)
 - مجوزهای جدید: orders.read، invoices.read → finance + system_admin
 - ترمیم‌های همراه: E501 booking.py، سکانس در conftest، invoicing بازنویسی تمیز
+
+---
+
+## 29) گام 12 — B10 + B11 پیاده‌سازی شد (اسپرینت S8)
+- مهاجرت 0008: finance.orders/payments/invoices/invoice_items + سکانس شماره فاکتور (سرویس فاکتور نیز خودترمیم است)
+- B10: POST /orders با Idempotency-Key الزامی (تکرار کلید → همان سفارش، 200 + meta.idempotent_replay)؛ سفارش فقط از نوبت pending_payment با snapshot؛ «یک سفارش فعال» فقط در منطق (بدون قید unique روی appointment_id تا سناریوی failure→سفارش جدید کار کند)
+- payments/start: آداپتور درگاه (MockGateway — D02 باز)؛ پرداخت فعال موازی → 409
+- payments/callback: بدون احراز کاربر؛ allowlist IP (خالی=فقط dev)؛ تأیید سروری با adapter؛ callback تکراری no-op (قاعده صریح سند)؛ success → paid + confirmed + فاکتور؛ failure → failed و امکان سفارش جدید
+- B11: فاکتور خودکار per paid order (idempotent)؛ شماره یکتا INV-{سال}-{سکانس}؛ مبلغ = snapshot؛ دسترسی مالک یا نقش مالی؛ PDF حداقلی بدون وابستگی (PDF فارسی به فاز UI موکول)
+- مجوزهای جدید: orders.read، invoices.read → finance + system_admin
+- درس‌های اجرایی ثبت‌شده: اصلاحات متنی همیشه خط‌محور با نشانه ASCII (تطبیق رشته فارسی شکننده)؛ هر heredoc یکپارچه بدون الحاق

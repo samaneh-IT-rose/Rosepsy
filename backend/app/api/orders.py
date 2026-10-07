@@ -156,7 +156,9 @@ def start_payment(
         select(Payment).where(Payment.order_id == order.id, Payment.status == "initiated")
     ).scalar_one_or_none()
     if in_progress is not None:
-        return error_response("PAYMENT_IN_PROGRESS", "یک پرداخت فعال برای این سفارش وجود دارد", 409)
+        return error_response(
+            "PAYMENT_IN_PROGRESS", "یک پرداخت فعال برای این سفارش وجود دارد", 409
+        )
 
     gateway = get_gateway()
     ref, url = gateway.start(order_id=order.id, amount=int(order.amount), currency=order.currency)

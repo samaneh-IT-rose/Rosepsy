@@ -33,15 +33,13 @@ class Settings(BaseSettings):
     # --- B08 / availability ---
     AVAILABILITY_TIMEZONE: str = "Asia/Tehran"
 
-    # --- B09 / booking (spec s.10 example: hold TTL = 10 minutes) ---
+    # --- B09 / booking ---
     BOOKING_HOLD_TTL_SECONDS: int = 600
     BOOKING_MAX_ADVANCE_DAYS: int = 31
 
     # --- B10 / payments (D02 open) ---
     PAYMENT_GATEWAY: str = "mock"
-    # Comma-separated gateway IPs allowed to call /payments/callback.
-    # Empty = unrestricted (dev only); production MUST set it.
-    PAYMENT_CALLBACK_ALLOWLIST: str = ""
+    PAYMENT_CALLBACK_ALLOWLIST: str = ""  # comma-separated IPs; empty = dev only
 
 
 @lru_cache
@@ -50,4 +48,3 @@ def get_settings() -> Settings:
 
 
 settings = get_settings()
-
