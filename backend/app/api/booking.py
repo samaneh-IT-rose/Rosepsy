@@ -22,6 +22,7 @@ from app.services.booking import (
     price_snapshot,
     validate_hold_window,
 )
+from app.services.notifications import enqueue_event
 
 router = APIRouter(tags=["booking"])
 
@@ -267,6 +268,12 @@ def cancel_appointment(
     a.status = "cancelled"
     a.cancelled_at = datetime.now(UTC)
     a.cancel_reason = (reason or "-")[:300]
+    enqueue_event(
+        db,
+        user_id=a.user_id,
+        event_type="appointment.cancelled",
+        payload={"appointment_id": str(a.id), "start_at": a.start_at.isoformat()},
+    )
     db.commit()
     write_audit(
         db,

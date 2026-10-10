@@ -41,6 +41,12 @@ TABLES = [
     "core.tariff_versions",
     "core.tariffs",
     "core.topics",
+    "core.messages",
+    "core.message_thread_members",
+    "core.message_threads",
+    "core.communication_preferences",
+    "core.notifications",
+    "core.notification_events",
     "audit.audit_logs",
 ]
 

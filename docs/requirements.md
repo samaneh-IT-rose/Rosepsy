@@ -365,3 +365,14 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - B11: فاکتور خودکار per paid order (idempotent)؛ شماره یکتا INV-{سال}-{سکانس}؛ مبلغ = snapshot؛ دسترسی مالک یا نقش مالی؛ PDF حداقلی بدون وابستگی (PDF فارسی به فاز UI موکول)
 - مجوزهای جدید: orders.read، invoices.read → finance + system_admin
 - درس‌های اجرایی ثبت‌شده: اصلاحات متنی همیشه خط‌محور با نشانه ASCII (تطبیق رشته فارسی شکننده)؛ هر heredoc یکپارچه بدون الحاق
+
+---
+
+## 30) گام 13 — B12 + B38 (هسته) پیاده‌سازی شد (اسپرینت S9)
+- مهاجرت 0009: core.notification_events (Outbox) / notifications / communication_preferences / message_threads / members / messages
+- الگوی Outbox سند: enqueue در همان تراکنش paid/cancel → شکست ارسال هرگز پرداخت را برگشت نمی‌زند
+- worker واقعی Celery (roz.process_outbox، --pool=solo)؛ process_outbox idempotent
+- متن اعلان فقط شناسه/مبلغ (قاعده B38) + تست عدم نشت
+- API: notifications (list/read مالک‌محور) · communication-preferences (marketing_consent پیش‌فرض False)
+- پیام‌رسانی حداقلی امن: فقط اعضای thread می‌بینند/می‌نویسند (404 برای غیرعضو)
+- فرایند جدید: env-check v2 خودترمیم (اجرای Docker Desktop + انتظار healthy) — بلوک ۰ هر گام

@@ -74,7 +74,7 @@ services:
         condition: service_healthy
     volumes:
       - "../backend:/app"
-    command: celery -A app.worker.celery_app worker -l info
+    command: celery -A app.worker.celery_app worker -l info --pool=solo
 
 volumes:
   pgdata:

@@ -18,6 +18,7 @@ from app.models.core import User
 from app.models.finance import Order, Payment
 from app.services.authz import has_permission, write_audit
 from app.services.gateway import get_gateway
+from app.services.notifications import enqueue_event
 
 router = APIRouter(tags=["orders", "payments"])
 
@@ -232,6 +233,12 @@ def payments_callback(
 
         invoice = create_invoice_for_order(db, order)
         invoice_id = str(invoice.id)
+        enqueue_event(
+            db,
+            user_id=order.user_id,
+            event_type="payment.success",
+            payload={"order_id": str(order.id), "amount": int(order.amount)},
+        )
     else:
         payment.status = "failed"
         order.status = "failed"
