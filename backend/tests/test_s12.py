@@ -103,12 +103,12 @@ def test_unknown_kind_404():
 def test_consent_versions_are_immutable():
     """DB trigger must reject UPDATE and DELETE on consent_versions."""
     grant(_phone(), "system_admin")  # ensures consent_versions are seeded
-    with pytest.raises(Exception):
+    with pytest.raises(Exception):  # noqa: B017 - psycopg raises generic DatabaseError
         with engine.begin() as conn:
             conn.execute(
                 text("UPDATE core.consent_versions SET text_fa = 'hacked'")
             )
-    with pytest.raises(Exception):
+    with pytest.raises(Exception):  # noqa: B017 - psycopg raises generic DatabaseError
         with engine.begin() as conn:
             conn.execute(text("DELETE FROM core.consent_versions"))
 

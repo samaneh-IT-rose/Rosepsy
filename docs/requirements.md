@@ -435,3 +435,15 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - GET /audit/access: گزارش ردیف‌های denied با مجوز audit.access.read (auditor_dpo + system_admin)؛ تست DPO-only
 - متن‌های رضایت: placeholder فارسی — تأیید نهایی با ذی‌نفع/حقوقی (نسخه‌بندی جایگزینی امن)
 - درس‌ها: عملگر ادامه‌خط PowerShell باید انتهای خط باشد (ParserError قبلی)؛ import ماژول‌سطحی برای هر نام استفاده‌شده؛ تست‌های trigger پیش از اجرا seed می‌گیرند
+
+---
+
+## 33) گام 16 — B13 + B14 + B15 + B16 پیاده‌سازی شد (اسپرینت S13+S14)
+- مهاجرت 0012: هشت جدول clinical (records/record_files/questionnaires/versions/submissions/encounters/notes/amendments)
+- قاعده طلایی B13: هر خواندن پرونده → write_access_event (allowed/denied با reason) — تست صریح هر دو حالت؛ خواندن مشاور فقط با رابطه encounter
+- پرونده فقط با رضایت فعال treatment (409 CONSENT_REQUIRED) — پیوند B41→B13 و BPMN فرایند 03؛ پیوست فایل پاک B39 توسط مالک
+- B14: پرسشنامه نسخه‌دار؛ submission به version قفل؛ تغییر فرم پاسخ قبلی را تغییر نمی‌دهد
+- B15: یادداشت فقط مشاور جلسه؛ پس از تأیید منجمد (409 NOTE_CONFIRMED) و فقط اصلاحیه append-only + رخداد حسابرسی
+- B16: چرخه وضعیت جلسه با گذارهای مجاز؛ پایش وضعیت از محتوای بالینی جدا
+- مجوزهای جدید: records.read/manage، questionnaires.manage، encounters.manage، notes.manage (seed بازنویسی کامل + اثبات import-level)
+- درس نهایی: هر پچ متنی فقط خط‌محور با نشانه ASCII + verify-then-write (الگو پیدا، بعد فایل بنویس) — دو Replace بی‌صدا و یک فایل اشتباه در این گام این قاعده را قطعی کرد

@@ -40,11 +40,25 @@ PERMISSIONS: list[tuple[str, str]] = [
     ("invoices.read", "مشاهده فاکتورها"),
     ("consents.manage", "مدیریت نسخه‌های رضایت‌نامه"),
     ("audit.access.read", "مشاهده گزارش دسترسی"),
+    ("records.read", "مشاهده پرونده مراجعان مجاز"),
+    ("records.manage", "ایجاد پرونده دیجیتال"),
+    ("questionnaires.manage", "مدیریت پرسشنامه‌های پرونده"),
+    ("encounters.manage", "زمان‌بندی و پایش جلسات"),
+    ("notes.manage", "ثبت و تأیید یادداشت جلسه"),
 ]
 
 GRANTS: dict[str, list[str]] = {
-    "reception": ["applicants.create", "applicants.read"],
-    "consultant": ["availability.manage"],
+    "reception": [
+        "applicants.create",
+        "applicants.read",
+        "records.manage",
+        "encounters.manage",
+    ],
+    "consultant": [
+        "availability.manage",
+        "records.read",
+        "notes.manage",
+    ],
     "finance": ["orders.read", "invoices.read"],
     "auditor_dpo": ["audit.access.read"],
     "system_admin": [
@@ -65,12 +79,15 @@ GRANTS: dict[str, list[str]] = {
         "invoices.read",
         "consents.manage",
         "audit.access.read",
+        "records.read",
+        "records.manage",
+        "questionnaires.manage",
+        "encounters.manage",
+        "notes.manage",
     ],
 }
 
-# DEV PLACEHOLDER texts - final wording requires legal/stakeholder approval
-# (documented in requirements.md; versioning means texts can be replaced later
-# by publishing a new version, old consents keep their original text).
+# DEV PLACEHOLDER texts - final wording requires legal/stakeholder approval.
 CONSENT_SEED: list[tuple[str, str, str]] = [
     (
         "treatment",
@@ -110,11 +127,7 @@ def seed_consent_versions(db: Session) -> int:
             select(ConsentVersion).where(ConsentVersion.kind == kind)
         ).scalar_one_or_none()
         if exists is None:
-            db.add(
-                ConsentVersion(
-                    kind=kind, version=1, title_fa=title_fa, text_fa=text_fa
-                )
-            )
+            db.add(ConsentVersion(kind=kind, version=1, title_fa=title_fa, text_fa=text_fa))
             created += 1
     if created:
         db.commit()

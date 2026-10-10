@@ -8,6 +8,16 @@ from app.models.catalog import (  # noqa: F401
     Specialty,
     VerificationReview,
 )
+from app.models.clinical import (  # noqa: F401
+    ClinicalRecord,
+    Encounter,
+    EncounterAmendment,
+    EncounterNote,
+    Questionnaire,
+    QuestionnaireVersion,
+    RecordFile,
+    Submission,
+)
 from app.models.consents import Consent, ConsentVersion  # noqa: F401
 from app.models.core import Applicant, AuthSession, OtpChallenge, Profile, User  # noqa: F401
 from app.models.files import File  # noqa: F401
