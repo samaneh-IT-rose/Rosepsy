@@ -14,14 +14,19 @@ def _phone() -> str:
 
 def _branch(hok, slug, lat, lon, city="تهران", status=None, hours=None):
     clinic_id = client.post(
-        "/api/v1/clinics", json={"name": f"کلینیک {slug}", "slug": slug},
+        "/api/v1/clinics",
+        json={"name": f"کلینیک {slug}", "slug": slug},
         headers=hok,
     ).json()["data"]["id"]
     bid = client.post(
         f"/api/v1/clinics/{clinic_id}/branches",
         json={
-            "name": f"شعبه {slug}", "slug": f"{slug}-b", "city": city,
-            "lat": lat, "lon": lon, "working_hours": hours,
+            "name": f"شعبه {slug}",
+            "slug": f"{slug}-b",
+            "city": city,
+            "lat": lat,
+            "lon": lon,
+            "working_hours": hours,
         },
         headers=hok,
     ).json()["data"]["id"]
@@ -30,20 +35,27 @@ def _branch(hok, slug, lat, lon, city="تهران", status=None, hours=None):
     return bid
 
 
+def _audit_nearby_count(engine) -> int:
+    with engine.connect() as conn:
+        return conn.execute(
+            text("SELECT count(*) FROM audit.audit_logs WHERE action LIKE '%nearby%'")
+        ).scalar_one()
+
+
 def test_nearby_sorts_by_distance_and_excludes_drafts():
     token, _ = grant(_phone(), "system_admin")
     hok = h(token)
-    # ونک نزدیک‌تر از مبدأ تست؛ میرداماد دورتر؛ شعبه پیش‌نویس غایب
     _branch(hok, "near-a", 35.7580, 51.4100, status="published")   # ~1.2km
     _branch(hok, "far-b", 35.7000, 51.3000, status="published")    # ~13km
-    _branch(hok, "draft-c", 35.7600, 51.4200)                      # draft
-    resp = client.get("/api/v1/public/branches/nearby", params={"lat": 35.7550, "lon": 51.4050})
+    _branch(hok, "draft-c", 35.7600, 51.4200)                      # draft -> hidden
+    resp = client.get(
+        "/api/v1/public/branches/nearby", params={"lat": 35.7550, "lon": 51.4050}
+    )
     assert resp.status_code == 200
     data = resp.json()["data"]
-    names = [b["name"] for b in data]
     assert len(data) == 2  # draft excluded
     assert data[0]["distance_km"] < data[1]["distance_km"]
-    assert "near-a" in names[0] and "far-b" in names[1]
+    assert "near-a" in data[0]["name"] and "far-b" in data[1]["name"]
 
 
 def test_nearby_requires_valid_coords():
@@ -56,22 +68,16 @@ def test_nearby_requires_valid_coords():
 def test_nearby_does_not_persist_location():
 
     from app.core.db import engine
+
     token, _ = grant(_phone(), "system_admin")
     hok = h(token)
     _branch(hok, "anon-x", 35.75, 51.41, status="published")
-    before = _audit_count(engine)
+    before = _audit_nearby_count(engine)
     resp = client.get(
         "/api/v1/public/branches/nearby", params={"lat": 35.7501, "lon": 51.4101}
     )
     assert resp.status_code == 200
-    assert _audit_count(engine) == before  # nothing recorded for the map query
-
-
-def _audit_count(engine) -> int:
-    with engine.connect() as conn:
-        return conn.execute(
-            text("SELECT count(*) FROM audit.audit_logs WHERE action LIKE '%nearby%'")
-        ).scalar_one()
+    assert _audit_nearby_count(engine) == before  # location never persisted
 
 
 def test_open_today_flag_in_nearby_response():
@@ -101,6 +107,6 @@ def test_is_open_now_pure(hours, weekday, clock, expected):
 
 
 def test_haversine_known_distance():
-    # تهران تا کرج ~ 39-42km; loose bounds keep the test stable
+    # Tehran to Karaj ~ 39-42km; loose bounds keep the test stable
     d = haversine_km(35.6892, 51.3890, 35.8355, 50.9915)
     assert 35.0 < d < 45.0
