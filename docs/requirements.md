@@ -447,3 +447,14 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - B16: چرخه وضعیت جلسه با گذارهای مجاز؛ پایش وضعیت از محتوای بالینی جدا
 - مجوزهای جدید: records.read/manage، questionnaires.manage، encounters.manage، notes.manage (seed بازنویسی کامل + اثبات import-level)
 - درس نهایی: هر پچ متنی فقط خط‌محور با نشانه ASCII + verify-then-write (الگو پیدا، بعد فایل بنویس) — دو Replace بی‌صدا و یک فایل اشتباه در این گام این قاعده را قطعی کرد
+
+---
+
+## 34) گام 17 — B29 + B30 (حداقلی امن) + گزارش وضعیت و گانت
+- scripts/backup_db.ps1: pg_dump -F c + نگهداری 30 روز (§11)
+- scripts/restore_drill.ps1: بازیابی واقعی در roz_drill + تطبیق شمارش + RTO + drill-log.md (دسته 12 §14)
+- scripts/smoke.ps1: health/ready/otp-login/openapi — دروازه <=3min (دسته 10)
+- docs/deployment.md: محیط‌ها/الزامات تولید/مهاجرت/rollback/Quality Gate
+- docs/backlog-status.md + docs/gantt.html: گزارش پیشرفت و برنامه باقی‌مانده
+- CI: سرویس minio + انتظار سلامت
+- درس اجرایی: heredoc تو در تو PowerShell نشست را می‌بندد → Parser::ParseFile نگهبان شد

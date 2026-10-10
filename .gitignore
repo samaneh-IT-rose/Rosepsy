@@ -39,3 +39,6 @@ tmp/
 
 # --- Docker override محلی ---
 docker-compose.override.yml
+
+# --- Backups ---
+backups/

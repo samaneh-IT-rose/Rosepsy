@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>گانت چارت — سامانه کلینیک رز</title>
+<style>
+:root{--ink:#1b3044;--line:#e1e8ed;--rose:#94365e;--teal:#147d78;--gold:#b88538;
+--blue:#2c5fa8;--green:#2e9e5b;--gray:#7a8a99;--navy:#34506e;--purple:#6f42a8}
+*{box-sizing:border-box}
+body{font-family:Tahoma,"Segoe UI",sans-serif;background:#f4f6f8;color:var(--ink);margin:0;padding:22px}
+h1{font-size:19px;margin:0 0 4px}
+.sub{color:#607385;font-size:12px;margin-bottom:14px}
+.badge{display:inline-block;background:#fff;border:1px solid var(--line);border-radius:10px;
+padding:6px 12px;margin-left:8px;font-size:12px}
+.badge b{color:var(--rose)}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px;
+box-shadow:0 10px 26px rgba(24,48,68,.06);overflow-x:auto;margin-bottom:16px}
+.gantt{min-width:920px}
+.ghead,.grow{display:grid;grid-template-columns:250px 1fr;align-items:center}
+.ghead{border-bottom:2px solid var(--line);padding-bottom:4px}
+.ghead .lbl,.grow .lbl{font-size:11.5px;padding-left:10px}
+.ghead .lbl{color:#607385;font-size:11px}
+.track{position:relative;height:30px;background:
+ repeating-linear-gradient(to left,transparent 0,transparent calc(100%/24 - 1px),#eef2f6 calc(100%/24 - 1px),#eef2f6 calc(100%/24))}
+.ghead .track{height:18px;display:flex}
+.ghead .track span{flex:1;text-align:center;font-size:9.5px;color:#8a99a8}
+.grow{height:34px}
+.grow:nth-child(even){background:#fbfdfe}
+.bar{position:absolute;top:6px;height:18px;border-radius:6px;color:#fff;font-size:9.5px;
+line-height:18px;padding:0 7px;white-space:nowrap;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+.now{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--rose);opacity:.55}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:#41586b;margin-top:12px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-left:5px;vertical-align:-2px}
+.done{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 18px;font-size:12px}
+.done li::before{content:"✓ ";color:var(--green);font-weight:bold}
+h2{font-size:15px;margin:0 0 10px}
+</style>
+</head>
+<body>
+<h1>گانت چارت اقدامات — سامانه کلینیک رز</h1>
+<div class="sub">محور: هفته (۲۴ هفته برنامه باقی‌مانده) · خط عمودی بنفش = امروز (ابتدای هفته ۱)</div>
+<div>
+  <span class="badge">پیشرفت کل (وزنی): <b>≈۴۰٪</b></span>
+  <span class="badge">انتشار ۱ بک‌اند: <b>≈۹۷٪</b></span>
+  <span class="badge">تست: <b>161 passed</b></span>
+  <span class="badge">مهاجرت: <b>12</b></span>
+</div>
+
+<div class="card">
+<h2>انجام‌شده تا امروز</h2>
+<ul class="done">
+<li>گام ۰–۳: محیط (PS7/Git/Docker) + نیازمندی‌ها + مخزن</li>
+<li>گام ۴–۵: استخراج کامل سند + اسکلت FastAPI (B01)</li>
+<li>گام ۶–۷: B02 ورود OTP + B03/B04 نقش و متقاضی</li>
+<li>گام ۸–۹: B05/B06/B31 + B07/B32 (S4+S5)</li>
+<li>گام ۱۰–۱۱: B08 تقویم + B09 رزرو و hold (S6+S7)</li>
+<li>گام ۱۲: B10/B11 پرداخت و فاکتور (S8)</li>
+<li>گام ۱۳: B12/B38 اعلان Outbox + پیام (S9)</li>
+<li>گام ۱۴: B39/B40 فایل امن MinIO + نقشه (S10+S11)</li>
+<li>گام ۱۵: B41 رضایت و حاکمیت داده (S12)</li>
+<li>گام ۱۶: B13–B16 پرونده/پرسشنامه/جلسه/یادداشت (S13+S14)</li>
+</ul>
+</div>
+
+<div class="card gantt">
+<div class="ghead">
+  <div class="lbl">اقدام / هفته</div>
+  <div class="track" id="weeks"></div>
+</div>
+
+<div class="grow"><div class="lbl">گام ۱۷ — بکاپ/بازیابی/Smoke (B29/B30)</div>
+<div class="track"><div class="bar" style="right:0;width:calc(100%/24 - 4px);background:var(--rose)">در جریان</div><div class="now"></div></div></div>
+
+<div class="grow"><div class="lbl">گام ۱۸ — B38 تکمیلی + Release v1.0.0-alpha</div>
+<div class="track"><div class="bar" style="right:calc(100%/24);width:calc(100%/24 - 4px);background:var(--rose)"></div><div class="now"></div></div></div>
+
+<div class="grow"><div class="lbl">UAT مسیرهای حیاتی + امنیت سبک (ZAP/Trivy)</div>
+<div class="track"><div class="bar" style="right:calc(2*100%/24);width:calc(2*100%/24 - 4px);background:var(--gray)">W2–W3</div><div class="now"></div></div></div>
+
+<div class="grow"><div class="lbl">انتشار ۲ — پایدارسازی بالینی + B17 Flutter</div>
+<div class="track"><div class="bar" style="right:calc(3*100%/24);width:calc(4*100%/24 - 4px);background:var(--teal)">W3–W6</div><div class="now"></div></div></div>
+
+<div class="grow"><div class="lbl">فرانت‌اند وب React/Vite (پنل‌ها + عمومی)</div>
+<div class="track"><div class="bar" style="right:calc(3*100%/24);width:calc(8*100%/24 - 4px);background:var(--purple)">W3–W10</div><div class="now"></div></div></div>
+
+<div class="grow"><div class="lbl">انتشار ۳ — مالی B18–B24 (کیف پول/حسابداری)</div>
+<div class="track"><div class="bar" style="right:calc(7*100%/24);width:calc(5*100%/24 - 4px);background:var(--gold)">W7–W11</div><div class="now"></div></div></div>
+
+<div class="grow"><div class="lbl">انتشار ۳ — آموزش B33–B36 (دوره/آزمون/گواهی)</div>
+<div class="track"><div class="bar" style="right:calc(9*100%/24);width:calc(5*100%/24 - 4px);background:var(--gold);opacity:.85">W9–W13</div><div class="now"></div></div></div>
+
+<div class="grow"><div class="lbl">انتشار ۴ — ارزیابی و AI کمکی B25/B26/B37</div>
+<div class="track"><div class="bar" style="right:calc(12*100%/24);width:calc(5*100%/24 - 4px);background:var(--blue)">W12–W16</div><div class="now"></div></div></div>
+
+<div class="grow"><div class="lbl">انتشار ۵ — ML و یکپارچه‌سازی B27/B28</div>
+<div class="track"><div class="bar" style="right:calc(16*100%/24);width:calc(4*100%/24 - 4px);background:var(--navy)">W16–W19</div><div class="now"></div></div></div>
+
+<div class="grow"><div class="lbl">تست بار/دسترس‌پذیری + UAT نهایی + Go-live</div>
+<div class="track"><div class="bar" style="right:calc(19*100%/24);width:calc(6*100%/24 - 4px);background:var(--green)">W19–W24</div><div class="now"></div></div></div>
+
+<div class="legend">
+<span><i style="background:var(--rose)"></i>انتشار ۱</span>
+<span><i style="background:var(--teal)"></i>انتشار ۲</span>
+<span><i style="background:var(--gold)"></i>انتشار ۳</span>
+<span><i style="background:var(--blue)"></i>انتشار ۴</span>
+<span><i style="background:var(--navy)"></i>انتشار ۵</span>
+<span><i style="background:var(--purple)"></i>فرانت‌اند (موازی)</span>
+<span><i style="background:var(--gray)"></i>کیفیت/امنیت</span>
+<span><i style="background:var(--green)"></i>Go-live</span>
+</div>
+</div>
+
+<script>
+(function(){
+  var w = document.getElementById("weeks");
+  for (var i = 1; i <= 24; i++) { var s = document.createElement("span"); s.textContent = i; w.appendChild(s); }
+})();
+</script>
+</body>
+</html>

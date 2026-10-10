@@ -32,6 +32,12 @@ jobs:
           --health-interval 5s
           --health-timeout 3s
           --health-retries 10
+      minio:
+        image: docker.arvancloud.ir/minio/minio:latest
+        ports: ["9000:9000"]
+        env:
+          MINIO_ROOT_USER: roz
+          MINIO_ROOT_PASSWORD: roz_dev_secret
     env:
       DATABASE_URL: postgresql+psycopg://roz:roz_dev@localhost:5432/roz
       REDIS_URL: redis://localhost:6379/0
@@ -44,6 +50,13 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -r requirements-dev.txt
+      - name: Wait for MinIO
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:9000/minio/health/live; then exit 0; fi
+            sleep 2
+          done
+          echo "MinIO not healthy" && exit 1
       - name: Lint (ruff)
         run: ruff check .
       - name: Tests (pytest)
