@@ -135,3 +135,33 @@ def revoke_role_grant(db: Session, user_id: uuid.UUID, grant_id: uuid.UUID) -> b
     db.delete(grant)
     db.commit()
     return True
+
+
+def write_access_event(
+    db: Session,
+    *,
+    actor_user_id=None,
+    subject_user_id=None,
+    action: str,
+    allowed: bool,
+    resource_type: str | None = None,
+    resource_id=None,
+    request_id: str | None = None,
+    ip: str | None = None,
+    detail: dict | None = None,
+) -> None:
+    """Structured data-access record (B41); wired for B13 sensitive reads."""
+    db.add(
+        AccessEvent(
+            actor_user_id=actor_user_id,
+            subject_user_id=subject_user_id,
+            action=action,
+            allowed=allowed,
+            resource_type=resource_type,
+            resource_id=resource_id,
+            request_id=request_id or request_id_var.get(),
+            ip=ip,
+            detail=detail,
+        )
+    )
+    db.commit()

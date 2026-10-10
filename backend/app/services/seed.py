@@ -1,4 +1,4 @@
-"""Seed roles/permissions and bootstrap the first system admin (idempotent)."""
+"""Seed roles/permissions, consent versions, and bootstrap the first admin."""
 
 import uuid
 
@@ -6,6 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.phone import normalize_iran_mobile
+from app.models.consents import ConsentVersion
 from app.models.core import User
 from app.models.rbac import Permission, Role, RolePermission
 from app.services.authz import grant_role
@@ -37,12 +38,15 @@ PERMISSIONS: list[tuple[str, str]] = [
     ("availability.manage", "مدیریت تقویم و دسترس‌پذیری"),
     ("orders.read", "مشاهده سفارش‌ها"),
     ("invoices.read", "مشاهده فاکتورها"),
+    ("consents.manage", "مدیریت نسخه‌های رضایت‌نامه"),
+    ("audit.access.read", "مشاهده گزارش دسترسی"),
 ]
 
 GRANTS: dict[str, list[str]] = {
     "reception": ["applicants.create", "applicants.read"],
     "consultant": ["availability.manage"],
     "finance": ["orders.read", "invoices.read"],
+    "auditor_dpo": ["audit.access.read"],
     "system_admin": [
         "applicants.create",
         "applicants.read",
@@ -59,8 +63,62 @@ GRANTS: dict[str, list[str]] = {
         "availability.manage",
         "orders.read",
         "invoices.read",
+        "consents.manage",
+        "audit.access.read",
     ],
 }
+
+# DEV PLACEHOLDER texts - final wording requires legal/stakeholder approval
+# (documented in requirements.md; versioning means texts can be replaced later
+# by publishing a new version, old consents keep their original text).
+CONSENT_SEED: list[tuple[str, str, str]] = [
+    (
+        "treatment",
+        "رضایت انجام خدمات مشاوره و درمان",
+        "بدین‌وسیله رضایت خود را برای دریافت خدمات مشاوره و درمان در کلینیک رز اعلام "
+        "می‌کنم و می‌دانم اطلاعات درمانی من صرفاً با رعایت محرمانگی و مطابق مقررات "
+        "استفاده می‌شود. (متن نهایی پس از تأیید حقوقی)",
+    ),
+    (
+        "psych_test",
+        "رضایت اجرای آزمون روان‌شناسی",
+        "رضایت دارم آزمون روان‌شناسی بر من اجرا شود و نتیجه آن توسط ناظر علمی تفسیر و "
+        "در پرونده من نگهداری شود. (متن نهایی پس از تأیید حقوقی)",
+    ),
+    (
+        "marketing",
+        "رضایت دریافت پیام‌های اطلاع‌رسانی و تبلیغاتی",
+        "رضایت دارم اخبار، دوره‌ها و اطلاع‌رسانی‌های تبلیغاتی کلینیک رز را از طریق "
+        "پیامک یا ایمیل دریافت کنم؛ این رضایت مستقل از خدمات درمانی است و هر زمان "
+        "قابل ابطال است. (متن نهایی پس از تأیید حقوقی)",
+    ),
+    (
+        "data_sharing",
+        "رضایت اشتراک داده",
+        "رضایت دارم داده‌های مشخص‌شده من مطابق قرارداد با سازمان مربوط به اشتراک "
+        "گذاشته شود؛ یادداشت‌های درمانی مشمول این رضایت نیستند. (متن نهایی پس از "
+        "تأیید حقوقی)",
+    ),
+]
+
+
+def seed_consent_versions(db: Session) -> int:
+    """Create version 1 for each kind if absent. Idempotent."""
+    created = 0
+    for kind, title_fa, text_fa in CONSENT_SEED:
+        exists = db.execute(
+            select(ConsentVersion).where(ConsentVersion.kind == kind)
+        ).scalar_one_or_none()
+        if exists is None:
+            db.add(
+                ConsentVersion(
+                    kind=kind, version=1, title_fa=title_fa, text_fa=text_fa
+                )
+            )
+            created += 1
+    if created:
+        db.commit()
+    return created
 
 
 def seed_roles(db: Session) -> None:
@@ -95,6 +153,7 @@ def seed_roles(db: Session) -> None:
             if link is None:
                 db.add(RolePermission(role_id=roles[role_name].id, permission_id=perms[code].id))
     db.commit()
+    seed_consent_versions(db)
 
 
 def promote_admin(db: Session, phone_raw: str) -> uuid.UUID:

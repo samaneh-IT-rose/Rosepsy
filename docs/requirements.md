@@ -409,3 +409,16 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - B40: /public/branches/nearby با هاورساین (services/geo.py، توابع خالص)؛ فقط published؛ مکان کاربر فقط برای مرتب‌سازی و هرگز ذخیره/audit نمی‌شود (تست صریح)؛ open_today از working_hours JSONB (None=نامعلوم)
 - زیرساخت: ایمیج MinIO از mirror arvancloud در compose ثبت شد (محدودیت Docker Hub) — ثبت ADR-04 برای منبع قطعی در تولید
 - env-check v2.1: minio به سرویس‌های پایه اضافه و سلامتش منتظر می‌ماند
+
+---
+
+## 32) گام 15 — B41 پیاده‌سازی شد (اسپرینت S12)
+- مهاجرت 0011: core.consent_versions / core.consents / audit.access_events + تریگر تغییرناپذیری
+- تغییرناپذیری متن نسخه‌ها با تریگر DB (UPDATE/DELETE → Exception؛ تست صریح) — «متن هر نسخه غیرقابل‌تغییر» به‌صورت تضمین معماری
+- نسخه فعال = بالاترین شماره؛ رضایت جدید به نسخه فعال snapshot می‌شود؛ رضایت قبلی متن و نسخه خودش را حفظ می‌کند (تست نسخه ۲)
+- grant: یک رضایت فعال per kind (409 تکراری)؛ ip/user-agent ثبت می‌شود؛ ابطال سابقه را حفظ و رضایت آینده را آزاد می‌کند (تست)
+- GET /consents: تاریخچه با متن نسخه و تاریخ‌ها (پذیرش صریح سند)
+- audit.access_events: جدول رخداد دسترسی ساختاریافته آماده B13 (هر خواندن درمانی اینجا ثبت می‌شود) + write_access_event در authz
+- GET /audit/access: گزارش ردیف‌های denied — مجوز audit.access.read برای auditor_dpo و system_admin؛ تست DPO-only
+- متن‌های اولیه رضایت: placeholder فارسی — تأیید نهایی با ذی‌نفع/حقوقی؛ نسخه‌بندی جایگزینی امن را ممکن می‌کند
+- درس اجرا: شمارش تست از regex تأیید می‌شود؛ commit صرفاً پس از سبز شدن (تخلف گام قبل ثبت شد)

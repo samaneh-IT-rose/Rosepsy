@@ -48,7 +48,17 @@ TABLES = [
     "core.communication_preferences",
     "core.notifications",
     "core.notification_events",
+    "audit.access_events",
     "audit.audit_logs",
+]
+
+TRIGGERS = [
+    (
+        "tr_consent_versions_immutable",
+        "CREATE TRIGGER tr_consent_versions_immutable "
+        "BEFORE UPDATE OR DELETE ON core.consent_versions "
+        "FOR EACH ROW EXECUTE FUNCTION core.prevent_consent_version_mutation()",
+    ),
 ]
 
 EXCLUSION_CONSTRAINTS = [
@@ -77,6 +87,21 @@ def prepare_db():
     import app.models  # noqa: F401
 
     Base.metadata.create_all(engine)
+    with engine.begin() as conn:
+        conn.execute(
+            text(
+                "CREATE OR REPLACE FUNCTION core.prevent_consent_version_mutation() "
+                "RETURNS trigger AS $$ BEGIN "
+                "RAISE EXCEPTION 'core.consent_versions is immutable'; "
+                "END; $$ LANGUAGE plpgsql"
+            )
+        )
+        for name, ddl in TRIGGERS:
+            exists = conn.execute(
+                text("SELECT 1 FROM pg_trigger WHERE tgname = :n"), {"n": name}
+            ).scalar()
+            if not exists:
+                conn.execute(text(ddl))
     with engine.begin() as conn:
         for name, ddl in EXCLUSION_CONSTRAINTS:
             exists = conn.execute(

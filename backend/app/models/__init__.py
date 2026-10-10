@@ -1,4 +1,4 @@
-from app.models.audit import AuditLog  # noqa: F401
+from app.models.audit import AccessEvent, AuditLog  # noqa: F401
 from app.models.availability import AvailabilityException, WeeklyRule  # noqa: F401
 from app.models.booking import Appointment, SlotClaim  # noqa: F401
 from app.models.catalog import (  # noqa: F401
@@ -8,6 +8,7 @@ from app.models.catalog import (  # noqa: F401
     Specialty,
     VerificationReview,
 )
+from app.models.consents import Consent, ConsentVersion  # noqa: F401
 from app.models.core import Applicant, AuthSession, OtpChallenge, Profile, User  # noqa: F401
 from app.models.files import File  # noqa: F401
 from app.models.finance import Invoice, InvoiceItem, Order, Payment  # noqa: F401
