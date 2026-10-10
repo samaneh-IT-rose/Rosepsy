@@ -1,6 +1,7 @@
 from datetime import time
 
 import pytest
+from sqlalchemy import text
 
 from app.services.geo import haversine_km, is_open_now
 from tests.helpers import client, grant, h
