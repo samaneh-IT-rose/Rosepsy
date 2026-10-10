@@ -1,4 +1,5 @@
 import uuid
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel, Field
@@ -91,7 +92,6 @@ def mark_read(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    from datetime import UTC
 
     n = db.get(Notification, notification_id)
     if n is None or n.user_id != user.id:

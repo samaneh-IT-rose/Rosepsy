@@ -376,3 +376,15 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - API: notifications (list/read مالک‌محور) · communication-preferences (marketing_consent پیش‌فرض False)
 - پیام‌رسانی حداقلی امن: فقط اعضای thread می‌بینند/می‌نویسند (404 برای غیرعضو)
 - فرایند جدید: env-check v2 خودترمیم (اجرای Docker Desktop + انتظار healthy) — بلوک ۰ هر گام
+
+---
+
+## 30) گام 13 — B12 + B38 (هسته) پیاده‌سازی شد (اسپرینت S9)
+- مهاجرت 0009: core.notification_events (Outbox) / notifications / communication_preferences / message_threads / members / messages
+- الگوی Outbox سند: enqueue در همان تراکنش paid/cancel → شکست ارسال هرگز پرداخت را برگشت نمی‌زند
+- worker واقعی Celery (roz.process_outbox، --pool=solo)؛ process_outbox idempotent
+- متن اعلان فقط شناسه/مبلغ (قاعده B38) + تست عدم نشت
+- API: notifications (list/read مالک‌محور) · communication-preferences (marketing_consent پیش‌فرض False)
+- پیام‌رسانی حداقلی امن: فقط اعضای thread می‌بینند/می‌نویسند (404 برای غیرعضو)
+- فرایند: env-check v2 خودترمیم (اجرای خودکار Docker Desktop + انتظار healthy) — بلوک ۰ هر گام
+- ترمیم این گام: import datetime در notifications.py، هدر تست‌های عضویت، ادعای body اعلان (order_id)

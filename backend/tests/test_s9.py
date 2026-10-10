@@ -197,8 +197,8 @@ def test_thread_membership_enforced():
     )
     assert created.status_code == 201
     tid = created.json()["data"]["id"]
-    outsider, hout = login(_phone())
-    denied = client.get(f"/api/v1/message-threads/{tid}/messages", headers=hout)
+    outsider, _ = login(_phone())
+    denied = client.get(f"/api/v1/message-threads/{tid}/messages", headers=h(outsider))
     assert denied.status_code == 404
     ok = client.get(f"/api/v1/message-threads/{tid}/messages", headers=hok)
     assert ok.status_code == 200
@@ -222,11 +222,11 @@ def test_message_post_and_view_member_only():
     assert posted.status_code == 201
     listed = client.get(f"/api/v1/message-threads/{tid}/messages", headers=hok)
     assert len(listed.json()["data"]) == 1
-    outsider, hout = login(_phone())
+    outsider, _ = login(_phone())
     denied = client.post(
         f"/api/v1/message-threads/{tid}/messages",
         json={"body": "تلاش نفوذ"},
-        headers=hout,
+        headers=h(outsider),
     )
     assert denied.status_code == 404
 
@@ -238,7 +238,7 @@ def test_notification_body_has_no_personal_data():
         process_outbox(db)
     listing = client.get("/api/v1/notifications", headers=hok).json()["data"]
     target = next(n for n in listing if n["event_type"] == "payment.success")
-    assert "order=" in target["body"]
+    assert "order_id=" in target["body"]
     assert "دکتر اعلان" not in target["body"]  # no names, no clinical text
 
 
