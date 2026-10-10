@@ -1,6 +1,8 @@
 import uuid
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -8,12 +10,14 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_current_user
 from app.api.permissions import require_permission
 from app.api.schemas import envelope, error_response
+from app.core.config import settings
 from app.core.db import get_db
 from app.core.logging import request_id_var
 from app.models.catalog import Service
 from app.models.core import User
 from app.models.org import Branch, BranchServiceOffering, Clinic
 from app.services.authz import scoped_branch_ids, write_audit
+from app.services.geo import haversine_km, is_open_now
 
 router = APIRouter(tags=["clinics"])
 
@@ -52,6 +56,11 @@ class OfferingsIn(BaseModel):
     service_ids: list[uuid.UUID] = Field(min_length=1, max_length=50)
 
 
+def _open_now(b: Branch) -> bool | None:
+    now = datetime.now(ZoneInfo(settings.AVAILABILITY_TIMEZONE))
+    return is_open_now(b.working_hours, now.weekday(), now.time())
+
+
 @router.post("/clinics", status_code=201)
 def create_clinic(
     body: ClinicIn,
@@ -62,8 +71,11 @@ def create_clinic(
     if dup is not None:
         return error_response("DUPLICATE_SLUG", "این slug قبلاً ثبت شده است", 409)
     c = Clinic(
-        name=body.name.strip(), slug=body.slug, description=body.description,
-        phone=body.phone, website=body.website,
+        name=body.name.strip(),
+        slug=body.slug,
+        description=body.description,
+        phone=body.phone,
+        website=body.website,
     )
     db.add(c)
     db.commit()
@@ -73,9 +85,7 @@ def create_clinic(
 @router.get("/clinics")
 def list_clinics(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     rows = db.execute(select(Clinic).where(Clinic.is_active.is_(True))).scalars().all()
-    return envelope(
-        data=[{"id": str(c.id), "name": c.name, "slug": c.slug} for c in rows]
-    )
+    return envelope(data=[{"id": str(c.id), "name": c.name, "slug": c.slug} for c in rows])
 
 
 @router.post("/clinics/{clinic_id}/branches", status_code=201)
@@ -91,10 +101,17 @@ def create_branch(
     if dup is not None:
         return error_response("DUPLICATE_SLUG", "این slug قبلاً ثبت شده است", 409)
     b = Branch(
-        clinic_id=clinic_id, name=body.name.strip(), slug=body.slug,
-        province=body.province, city=body.city, address=body.address,
-        postal_code=body.postal_code, lat=body.lat, lon=body.lon,
-        working_hours=body.working_hours, status="draft",
+        clinic_id=clinic_id,
+        name=body.name.strip(),
+        slug=body.slug,
+        province=body.province,
+        city=body.city,
+        address=body.address,
+        postal_code=body.postal_code,
+        lat=body.lat,
+        lon=body.lon,
+        working_hours=body.working_hours,
+        status="draft",
     )
     db.add(b)
     db.commit()
@@ -107,20 +124,10 @@ def list_branches(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    rows = (
-        db.execute(select(Branch).where(Branch.clinic_id == clinic_id))
-        .scalars()
-        .all()
-    )
+    rows = db.execute(select(Branch).where(Branch.clinic_id == clinic_id)).scalars().all()
     return envelope(
         data=[
-            {
-                "id": str(b.id),
-                "name": b.name,
-                "slug": b.slug,
-                "city": b.city,
-                "status": b.status,
-            }
+            {"id": str(b.id), "name": b.name, "slug": b.slug, "city": b.city, "status": b.status}
             for b in rows
         ]
     )
@@ -167,11 +174,7 @@ def set_branch_services(
     branch = db.get(Branch, branch_id)
     if branch is None:
         return error_response("BRANCH_NOT_FOUND", "شعبه یافت نشد", 404)
-    found = (
-        db.execute(select(Service).where(Service.id.in_(body.service_ids)))
-        .scalars()
-        .all()
-    )
+    found = db.execute(select(Service).where(Service.id.in_(body.service_ids))).scalars().all()
     if len(found) != len(set(body.service_ids)):
         return error_response("SERVICE_NOT_FOUND", "یک یا چند خدمت یافت نشد", 404)
     current = {
@@ -242,7 +245,47 @@ def public_branches(city: str | None = None, db: Session = Depends(get_db)):
                 "province": b.province,
                 "lat": float(b.lat),
                 "lon": float(b.lon),
+                "open_today": _open_now(b),
             }
             for b in rows
+        ]
+    )
+
+
+@router.get("/public/branches/nearby")
+def nearby_branches(
+    lat: float = Query(ge=-90, le=90),
+    lon: float = Query(ge=-180, le=180),
+    limit: int = Query(default=10, ge=1, le=50),
+    db: Session = Depends(get_db),
+):
+    """Closest published branches (B40).
+
+    The user location is used for sorting ONLY and never persisted (spec rule).
+    No authentication; no audit row (nothing to audit - no data touched).
+    """
+    rows = (
+        db.execute(select(Branch).where(Branch.status == "published"))
+        .scalars()
+        .all()
+    )
+    scored = []
+    for b in rows:
+        distance = haversine_km(lat, lon, float(b.lat), float(b.lon))
+        scored.append((distance, b))
+    scored.sort(key=lambda pair: pair[0])
+    return envelope(
+        data=[
+            {
+                "id": str(b.id),
+                "name": b.name,
+                "city": b.city,
+                "province": b.province,
+                "lat": float(b.lat),
+                "lon": float(b.lon),
+                "distance_km": round(distance, 2),
+                "open_today": _open_now(b),
+            }
+            for distance, b in scored[:limit]
         ]
     )

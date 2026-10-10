@@ -7,3 +7,4 @@ alembic>=1.14
 psycopg[binary]>=3.2
 redis>=5.2
 celery>=5.4
+minio>=7.2

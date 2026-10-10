@@ -9,6 +9,7 @@ from app.models.catalog import (  # noqa: F401
     VerificationReview,
 )
 from app.models.core import Applicant, AuthSession, OtpChallenge, Profile, User  # noqa: F401
+from app.models.files import File  # noqa: F401
 from app.models.finance import Invoice, InvoiceItem, Order, Payment  # noqa: F401
 from app.models.notify import (  # noqa: F401
     CommunicationPreference,

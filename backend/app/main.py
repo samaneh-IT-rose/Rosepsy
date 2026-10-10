@@ -15,6 +15,7 @@ from app.api import (
     catalog,
     clinics,
     consultants,
+    files,
     health,
     invoices,
     me,
@@ -115,6 +116,7 @@ app.include_router(booking.router, prefix=settings.API_V1_PREFIX)
 app.include_router(orders.router, prefix=settings.API_V1_PREFIX)
 app.include_router(invoices.router, prefix=settings.API_V1_PREFIX)
 app.include_router(notifications.router, prefix=settings.API_V1_PREFIX)
+app.include_router(files.router, prefix=settings.API_V1_PREFIX)
 
 
 @app.get("/")

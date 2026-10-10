@@ -388,3 +388,13 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - پیام‌رسانی حداقلی امن: فقط اعضای thread می‌بینند/می‌نویسند (404 برای غیرعضو)
 - فرایند: env-check v2 خودترمیم (اجرای خودکار Docker Desktop + انتظار healthy) — بلوک ۰ هر گام
 - ترمیم این گام: import datetime در notifications.py، هدر تست‌های عضویت، ادعای body اعلان (order_id)
+
+---
+
+## 31) گام 14 — B39 + B40 پیاده‌سازی شد (اسپرینت S10+S11)
+- مهاجرت 0010: core.files (فراداده فقط — بایت‌ها هرگز در DB نیستند، طبق سند §03)
+- B39: upload-intent → Presigned PUT کوتاه‌عمر MinIO (اولین استفاده واقعی از MinIO compose)؛ complete → stat تطبیق حجم + checksum(etag) → scanning → اسکن همگام → clean|quarantined؛ download-ticket فقط برای مالک و فقط clean، عمر 60 ثانیه؛ quarantined هرگز ticket نمی‌گیرد
+- محدودیت واقعی نوع/حجم: allowlist (png/jpeg/pdf) و سقف 20MB؛ دو لایه رد (API + تست)
+- اسکنر: interface قابل تعویض در services/av.py با mock قطعی — ادغام AV واقعی به‌عنوان ADR آینده ثبت شد
+- B40: /public/branches/nearby با هاورساین در services/geo.py (تابع خالص)؛ فقط published؛ مرتب‌سازی فاصله؛ مکان کاربر فقط برای مرتب‌سازی و هرگز ذخیره/audit نمی‌شود (تست صریح)؛ open_today از working_hours JSONB (None=نامعلوم) — معیار پذیرش «شعبه تعطیل با نشان» پوشش داده شد
+- env-check v2.1: minio به سرویس‌های پایه اضافه و سلامتش منتظر می‌ماند

@@ -41,6 +41,17 @@ class Settings(BaseSettings):
     PAYMENT_GATEWAY: str = "mock"
     PAYMENT_CALLBACK_ALLOWLIST: str = ""  # comma-separated IPs; empty = dev only
 
+    # --- B39 / secure files (ADR-04 default: MinIO / S3-compatible) ---
+    MINIO_ENDPOINT: str = "localhost:9000"
+    MINIO_ACCESS_KEY: str = "roz"
+    MINIO_SECRET_KEY: str = "roz_dev_secret"
+    MINIO_BUCKET: str = "roz-files"
+    MINIO_SECURE: bool = False
+    FILE_MAX_BYTES: int = 20 * 1024 * 1024
+    FILE_ALLOWED_CONTENT_TYPES: str = "image/png,image/jpeg,application/pdf"
+    UPLOAD_URL_TTL_SECONDS: int = 900
+    DOWNLOAD_TICKET_TTL_SECONDS: int = 60
+
 
 @lru_cache
 def get_settings() -> Settings:
