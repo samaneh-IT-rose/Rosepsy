@@ -465,3 +465,13 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - Tag v1.0.0-alpha روی commit ed4fc47
 - 165 passed / 0 failed · ruff پاک · Smoke GREEN · drill users 1→1
 - درس‌های نهایی این مرحله: تست‌های تراکنشی trigger را با session_replication_role=replica در cleanup bypass کنید؛ cleanup با DELETE + lock_timeout (نه TRUNCATE)؛ اثبات انکودینگ با fingerprint روی دیسک (UTF-8 بدون BOM برای فایل‌های فارسی)
+
+---
+
+## 36) گام 19 — انتشار ۲ گام ۱: خودکارسازی paid→پرونده→جلسه
+- services/automation.py: fulfill_paid_appointment — بدون commit داخلی؛ داخل تراکنش callback پرداخت (اتمیک با paid)
+- رضایت فعال treatment قید غلبه: بدون رضایت → بدون داده بالینی + اعلان consent.required (Outbox)
+- پرونده: بازاستفاده در صورت وجود، وگرنه ساخت سیستمی + AccessEvent (actor=system)
+- جلسه: یکتا با appointment_id، status=scheduled؛ مشاور نامعتبر → بدون جلسه + اعلان encounter.auto_create_failed به system_adminهای فعال
+- پاسخ callback: افزودن غیرشکننده fulfillment (مسیر noop مینیمال می‌ماند)
+- ۵ تست جدید (جمع 170): مسیر کامل، بدون رضایت، بازاستفاده پرونده، callback تکراری، مشاور منقضی

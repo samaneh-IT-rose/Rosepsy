@@ -17,6 +17,7 @@ from app.models.booking import Appointment
 from app.models.core import User
 from app.models.finance import Order, Payment
 from app.services.authz import has_permission, write_audit
+from app.services.automation import fulfill_paid_appointment
 from app.services.gateway import get_gateway
 from app.services.notifications import enqueue_event
 
@@ -221,6 +222,7 @@ def payments_callback(
     payment.raw_callback = raw
     order = db.get(Order, payment.order_id)
     invoice_id = None
+    fulfillment = None
     if ok:
         payment.status = "verified"
         payment.verified_at = datetime.now(UTC)
@@ -229,6 +231,7 @@ def payments_callback(
             appt = db.get(Appointment, order.appointment_id)
             if appt is not None and appt.status == "pending_payment":
                 appt.status = "confirmed"
+                fulfillment = fulfill_paid_appointment(db, appointment=appt)
         from app.services.invoicing import create_invoice_for_order
 
         invoice = create_invoice_for_order(db, order)
@@ -258,6 +261,7 @@ def payments_callback(
             "order_id": str(order.id),
             "order_status": order.status,
             "invoice_id": invoice_id,
+            "fulfillment": fulfillment,
             "noop": False,
         }
     )
