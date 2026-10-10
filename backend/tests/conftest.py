@@ -127,13 +127,14 @@ def _cleanup() -> None:
         rows = conn.execute(
             text(
                 "SELECT table_schema || '.' || table_name FROM information_schema.tables "
-                "WHERE table_schema IN ('core','booking','finance','audit')"
+                "WHERE table_schema IN ('core','booking','clinical','finance','audit')"
             )
         ).scalars().all()
         existing = set(rows)
         targets = [t for t in TABLES if t in existing]
-        if targets:
-            conn.execute(text("TRUNCATE TABLE " + ", ".join(targets) + " CASCADE"))
+        conn.execute(text("SET LOCAL session_replication_role = replica"))
+        for t in targets:
+            conn.execute(text("DELETE FROM " + t))
     redis = get_redis()
     for key in redis.scan_iter("rl:otp:*"):
         redis.delete(key)

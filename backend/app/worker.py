@@ -24,4 +24,4 @@ def process_outbox_task():
 
     with SessionLocal() as db:
         processed = process_outbox(db)
-    return {"processed": processed}
+    return processed

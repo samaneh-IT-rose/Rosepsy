@@ -124,7 +124,7 @@ def test_outbox_processing_creates_notification():
     _paid_flow("s9-key-2")
     with SessionLocal() as db:
         n = process_outbox(db)
-        assert n >= 1
+        assert n['processed'] >= 1
         counts = db.execute(
             text(
                 "SELECT status, count(*) FROM core.notification_events "
@@ -165,8 +165,8 @@ def test_process_outbox_is_idempotent():
     with SessionLocal() as db:
         first = process_outbox(db)
         second = process_outbox(db)
-    assert first >= 1
-    assert second == 0  # nothing pending remains
+    assert first['processed'] >= 1
+    assert second['processed'] == 0  # nothing pending remains
 
 
 def test_preferences_defaults_and_update():
@@ -233,20 +233,20 @@ def test_message_post_and_view_member_only():
 
 def test_notification_body_has_no_personal_data():
     """B38 rule: system notification text carries IDs/codes only."""
-    hok, _, _, _ = _paid_flow("s9-key-6")
+    hok, _appt, order_id, _invoice = _paid_flow("s9-key-6")
     with SessionLocal() as db:
         process_outbox(db)
     listing = client.get("/api/v1/notifications", headers=hok).json()["data"]
     target = next(n for n in listing if n["event_type"] == "payment.success")
-    assert "order_id=" in target["body"]
-    assert "دکتر اعلان" not in target["body"]  # no names, no clinical text
-
-
+    assert order_id in target["body"]        # IDs are allowed
+    assert "4500000" in target["body"]       # amounts are allowed
+    assert "دکتر" not in target["body"]      # no person names
+    assert "یادداشت" not in target["body"]   # no clinical content
 def test_worker_task_processes_outbox():
     _paid_flow("s9-key-7")
     result = process_outbox_task.apply()  # eager, no broker needed
     assert result.successful
-    assert result.result["processed"] >= 1
+    assert result.result['processed'] >= 1
     with engine.begin() as conn:
         pending = conn.execute(
             text("SELECT count(*) FROM core.notification_events WHERE status = 'pending'")

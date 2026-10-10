@@ -36,6 +36,7 @@ class Settings(BaseSettings):
     # --- B09 / booking ---
     BOOKING_HOLD_TTL_SECONDS: int = 600
     BOOKING_MAX_ADVANCE_DAYS: int = 31
+    NOTIF_MAX_ATTEMPTS: int = 3  # B38: channel retry then mark failed
 
     # --- B10 / payments (D02 open) ---
     PAYMENT_GATEWAY: str = "mock"
