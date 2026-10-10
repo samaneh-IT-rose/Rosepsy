@@ -13,7 +13,7 @@ Check "health" ($h.data.status -eq "ok")
  $r = Invoke-RestMethod "$BaseUrl/ready" -TimeoutSec 5
 Check "ready(db+redis)" ($r.data.status -eq "ready")
 
- $phone = "09129990" + (Get-Random -Minimum 1000 -Maximum 9999)
+    $phone = "0912999" + (Get-Random -Minimum 1000 -Maximum 9999)  # 11 digits total
  $req = Invoke-RestMethod -Method Post -Uri "$BaseUrl/api/v1/auth/otp/request" -ContentType "application/json" -Body ('{"phone":"' + $phone + '"}') -TimeoutSec 5
 Start-Sleep -Milliseconds 400
  $e164 = "+98" + $phone.TrimStart("0")
