@@ -458,3 +458,10 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - docs/backlog-status.md + docs/gantt.html: گزارش پیشرفت و برنامه باقی‌مانده
 - CI: سرویس minio + انتظار سلامت
 - درس اجرایی: heredoc تو در تو PowerShell نشست را می‌بندد → Parser::ParseFile نگهبان شد
+
+---
+
+## 35) Release v1.0.0-alpha — تحویل شد
+- Tag v1.0.0-alpha روی commit ed4fc47
+- 165 passed / 0 failed · ruff پاک · Smoke GREEN · drill users 1→1
+- درس‌های نهایی این مرحله: تست‌های تراکنشی trigger را با session_replication_role=replica در cleanup bypass کنید؛ cleanup با DELETE + lock_timeout (نه TRUNCATE)؛ اثبات انکودینگ با fingerprint روی دیسک (UTF-8 بدون BOM برای فایل‌های فارسی)
