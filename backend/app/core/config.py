@@ -41,6 +41,7 @@ class Settings(BaseSettings):
     # --- B10 / payments (D02 open) ---
     PAYMENT_GATEWAY: str = "mock"
     PAYMENT_CALLBACK_ALLOWLIST: str = ""  # comma-separated IPs; empty = dev only
+    CORS_ORIGINS: str = "*"  # dev only; prod must list exact origins
 
     # --- B39 / secure files (ADR-04 default: MinIO / S3-compatible) ---
     MINIO_ENDPOINT: str = "localhost:9000"

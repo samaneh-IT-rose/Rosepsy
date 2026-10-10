@@ -59,6 +59,21 @@ app = FastAPI(
 )
 
 
+if settings.CORS_ORIGINS == "*":
+    cors_origins = ["*"]
+else:
+    cors_origins = [o.strip() for o in settings.CORS_ORIGINS.split(",") if o.strip()]
+
+from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_origins,
+    allow_credentials=False,  # auth is Bearer header, not cookies
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.middleware("http")
 async def request_context_middleware(request: Request, call_next):
     """Assign/propagate X-Request-ID for error tracing (B01)."""

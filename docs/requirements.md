@@ -475,3 +475,12 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - جلسه: یکتا با appointment_id، status=scheduled؛ مشاور نامعتبر → بدون جلسه + اعلان encounter.auto_create_failed به system_adminهای فعال
 - پاسخ callback: افزودن غیرشکننده fulfillment (مسیر noop مینیمال می‌ماند)
 - ۵ تست جدید (جمع 170): مسیر کامل، بدون رضایت، بازاستفاده پرونده، callback تکراری، مشاور منقضی
+
+---
+
+## 37) گام 20 — B17 فاز ۱: اپ Flutter (OTP + نوبت‌ها + اعلان‌ها)
+- mobile/: پروژه Flutter + http/secure_storage/provider/dotenv
+- CORS بک‌اند: middleware + تست preflight (جمع 171) — Bearer محور، بدون credentials
+- ApiClient با envelope-parsing و ApiException فارسی؛ توکن در flutter_secure_storage
+- صفحات: ورود دو مرحله‌ای OTP، نوبت‌های من، اعلان‌ها با markRead؛ لاگ‌اوت
+- تست‌های اپ: ۲ unit (ذخیره توکن، پیام خطای فارسی) + flutter analyze پاک
