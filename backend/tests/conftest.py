@@ -41,6 +41,8 @@ TABLES = [
     "core.tariff_versions",
     "core.tariffs",
     "core.topics",
+    "core.consents",
+    "core.consent_versions",
     "core.files",
     "core.messages",
     "core.message_thread_members",

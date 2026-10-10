@@ -422,3 +422,16 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - GET /audit/access: گزارش ردیف‌های denied — مجوز audit.access.read برای auditor_dpo و system_admin؛ تست DPO-only
 - متن‌های اولیه رضایت: placeholder فارسی — تأیید نهایی با ذی‌نفع/حقوقی؛ نسخه‌بندی جایگزینی امن را ممکن می‌کند
 - درس اجرا: شمارش تست از regex تأیید می‌شود؛ commit صرفاً پس از سبز شدن (تخلف گام قبل ثبت شد)
+
+---
+
+## 32) گام 15 — B41 پیاده‌سازی شد (اسپرینت S12)
+- مهاجرت 0011: core.consent_versions / core.consents / audit.access_events + تریگر تغییرناپذیری
+- تغییرناپذیری متن نسخه‌ها با تریگر DB (UPDATE/DELETE → Exception؛ تست صریح) — تضمین معماری نه شعار
+- نسخه فعال = بالاترین شماره؛ رضایت جدید به نسخه فعال snapshot می‌شود؛ رضایت قبلی متن/نسخه خودش را حفظ می‌کند (تست نسخه ۲)
+- grant: یک رضایت فعال per kind (409 تکراری)؛ ip/user-agent ثبت؛ ابطال سابقه را حفظ و رضایت آینده را آزاد می‌کند
+- GET /consents: تاریخچه با متن نسخه و تاریخ‌ها (پذیرش صریح سند)
+- audit.access_events + write_access_event در authz — زیرساخت «هر خواندن درمانی = رخداد» برای B13
+- GET /audit/access: گزارش ردیف‌های denied با مجوز audit.access.read (auditor_dpo + system_admin)؛ تست DPO-only
+- متن‌های رضایت: placeholder فارسی — تأیید نهایی با ذی‌نفع/حقوقی (نسخه‌بندی جایگزینی امن)
+- درس‌ها: عملگر ادامه‌خط PowerShell باید انتهای خط باشد (ParserError قبلی)؛ import ماژول‌سطحی برای هر نام استفاده‌شده؛ تست‌های trigger پیش از اجرا seed می‌گیرند

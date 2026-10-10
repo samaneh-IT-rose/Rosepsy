@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -7,6 +6,7 @@ from app.api.permissions import require_permission
 from app.api.schemas import envelope
 from app.core.db import get_db
 from app.models.audit import AuditLog
+from app.models.core import User
 
 router = APIRouter(tags=["audit"])
 

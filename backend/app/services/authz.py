@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.logging import request_id_var
-from app.models.audit import AuditLog
+from app.models.audit import AccessEvent, AuditLog
 from app.models.rbac import Permission, Role, RolePermission, UserRole
 
 
