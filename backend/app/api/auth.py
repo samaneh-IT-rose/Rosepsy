@@ -73,7 +73,10 @@ def request_otp(body: OtpRequestIn, request: Request, db: Session = Depends(get_
         resp.headers["Retry-After"] = str(ttl_ip)
         return resp
 
-    code = generate_otp_code(settings.OTP_CODE_LENGTH)
+    if settings.ENV == "dev" and settings.SMS_PROVIDER == "dev_fixed":
+        code = settings.DEV_FIXED_OTP_CODE  # fixed demo code (dev only)
+    else:
+        code = generate_otp_code(settings.OTP_CODE_LENGTH)
     now = datetime.now(UTC)
     # A fresh request supersedes previous open challenges for this phone.
     db.execute(

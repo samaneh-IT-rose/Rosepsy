@@ -493,3 +493,10 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - conftest: SMS_PROVIDER=mock در تست‌ها قفل شد (تست‌ها از mock می‌خوانند)
 - تست جدید (جمع 172): ورود با کد ثابت + رد کد اشتباه
 - سناریوی تحویل بدون خواندن لاگ سرور
+
+---
+## 40) فیکس ریشه‌ای dev_fixed OTP: کد در auth.py تولید می‌شد، sender فقط لاگ می‌کرد
+- ریشه: generate_otp_code تصادفی هش و ذخیره می‌شد؛ DevFixedSmsSender فقط لاگ می‌کرد و نمی‌توانست کد را عوض کند
+- فیکس: در auth.py وقتی ENV=dev و SMS_PROVIDER=dev_fixed، خود کد ثابت ساخته و هش می‌شود
+- اثر: verify با 123456 موفق؛ تست‌های mock-provider دست‌نخورده (مسیر else)
+- درس: sender فقط transport است؛ تولید کد در لایه auth می‌ماند — تغییر سیاست کد باید در همان لایه باشد
