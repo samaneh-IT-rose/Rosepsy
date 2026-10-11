@@ -1,3 +1,11 @@
+﻿"""SMS sending (B02/B38). Providers (D04 open) plug in behind SmsSender.
+
+- MockSmsSender: logs the code (and keeps in-memory capture for tests).
+- DevFixedSmsSender: dev/acceptance convenience - a FIXED code (default
+  123456) so deliveries can be demoed without reading server logs.
+  It is ONLY reachable when ENV=dev; any other env raises at startup.
+"""
+
 import logging
 from abc import ABC, abstractmethod
 from datetime import UTC, datetime
@@ -14,12 +22,7 @@ class SmsSender(ABC):
 
 
 class MockSmsSender(SmsSender):
-    """Development sender (D04 open): the code goes to the app log AND to
-    backend/logs/dev-otp.log so the manual test flow can read it easily.
-
-    It must never appear in an HTTP response. Real providers (kavenegar /
-    faraz / ...) plug in behind this interface once D04 is decided.
-    """
+    """Logs the code and captures it in memory (used by the test suite)."""
 
     def __init__(self) -> None:
         self.sent: list[dict[str, str]] = []
@@ -42,10 +45,29 @@ class MockSmsSender(SmsSender):
         )
 
 
+class DevFixedSmsSender(SmsSender):
+    """Fixed code for dev/acceptance demos (no log reading needed).
+    The fixed code never leaves the server; the API response stays clean."""
+
+    def __init__(self, fixed_code: str = "123456") -> None:
+        self.fixed_code = fixed_code
+
+    def send_otp(self, phone_e164: str, code: str) -> None:
+        logger.info(
+            "sms dev-fixed to=%s (provider=dev_fixed env=%s) -> use code %s",
+            phone_e164,
+            settings.ENV,
+            self.fixed_code,
+        )
+
+
 _MOCK = MockSmsSender()
+_DEV_FIXED = DevFixedSmsSender(settings.DEV_FIXED_OTP_CODE)
 
 
 def get_sms_sender() -> SmsSender:
-    if settings.SMS_PROVIDER != "mock":
-        raise RuntimeError(f"unknown SMS_PROVIDER={settings.SMS_PROVIDER}")
-    return _MOCK
+    if settings.ENV == "dev" and settings.SMS_PROVIDER == "dev_fixed":
+        return _DEV_FIXED
+    if settings.SMS_PROVIDER == "mock":
+        return _MOCK
+    raise RuntimeError(f"unknown SMS_PROVIDER={settings.SMS_PROVIDER}")

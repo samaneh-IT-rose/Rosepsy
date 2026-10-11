@@ -484,3 +484,12 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - ApiClient با envelope-parsing و ApiException فارسی؛ توکن در flutter_secure_storage
 - صفحات: ورود دو مرحله‌ای OTP، نوبت‌های من، اعلان‌ها با markRead؛ لاگ‌اوت
 - تست‌های اپ: ۲ unit (ذخیره توکن، پیام خطای فارسی) + flutter analyze پاک
+
+---
+
+## 38) گام 21 — کد OTP ثابت dev برای تحویل (B02/B38)
+- DevFixedSmsSender: کد ثابت (پیش‌فرض 123456، قابل‌تنظیم DEV_FIXED_OTP_CODE) — فقط وقتی ENV=dev و SMS_PROVIDER=dev_fixed
+- در test/staging/prod هرگز فعال نمی‌شود (Runtime در غیر این حالت)؛ پاسخ API همچنان بدون کد
+- conftest: SMS_PROVIDER=mock در تست‌ها قفل شد (تست‌ها از mock می‌خوانند)
+- تست جدید (جمع 172): ورود با کد ثابت + رد کد اشتباه
+- سناریوی تحویل بدون خواندن لاگ سرور

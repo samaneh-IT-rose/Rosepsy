@@ -3,6 +3,7 @@ import os
 os.environ.setdefault("DATABASE_URL", "postgresql+psycopg://roz:roz_dev@localhost:5432/roz")
 os.environ.setdefault("REDIS_URL", "redis://localhost:6379/0")
 os.environ.setdefault("OTP_PEPPER", "test-pepper")
+os.environ["SMS_PROVIDER"] = "mock"  # tests read codes from MockSmsSender
 
 import pytest
 from sqlalchemy import text

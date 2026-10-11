@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     OTP_RATE_WINDOW_SECONDS: int = 600
     AUTH_SESSION_TTL_SECONDS: int = 7 * 24 * 3600
     SMS_PROVIDER: str = "mock"  # D04 open; mock logs the code only
+    DEV_FIXED_OTP_CODE: str = "123456"  # used only when ENV=dev and SMS_PROVIDER=dev_fixed
 
     # --- B08 / availability ---
     AVAILABILITY_TIMEZONE: str = "Asia/Tehran"
