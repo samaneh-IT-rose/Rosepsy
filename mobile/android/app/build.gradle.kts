@@ -7,6 +7,7 @@ plugins {
 android {
     namespace = "ir.rozclinic.roz_mobile"
     compileSdk = flutter.compileSdkVersion
+        buildToolsVersion = "35.0.0"
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

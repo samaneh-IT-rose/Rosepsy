@@ -536,3 +536,12 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - mirrorهای gradle اپ (aliyun) + wrapper tencent — dl.google.com بلاک است
 - mobile/.env با IP LAN (192.168.8.39)؛ سرور 0.0.0.0؛ فایروال 8000 (admin)
 - خروجی: app-release.apk نصب و تست روی گوشی واقعی با کد OTP ثابت 123456
+
+---
+## 42) گام 22 — Android SDK کامل و APK واقعی
+- init.gradle سراسری add-only (aliyun اول) — crash قبلی رفع شد
+- cmdline-tools از Tencent؛ پکیج‌ها با multi-candidate mirror: platform-tools 35.0.0، build-tools 35.0.0، platform 35، NDK 28.2.13676358
+- buildToolsVersion = 35.0.0 فیکس شد در android/app/build.gradle.kts (build-tools r36 ZIP روی mirrorها 404)
+- mirrorهای gradle اپ (aliyun) + wrapper tencent — dl.google.com بلاک است
+- mobile/.env با IP LAN (192.168.8.39)؛ سرور 0.0.0.0؛ فایروال 8000 (admin rule)
+- خروجی: app-release.apk نصب و تست روی گوشی واقعی با کد OTP ثابت 123456
