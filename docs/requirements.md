@@ -512,3 +512,11 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - ریشه: settings با lru_cache هنگام import ساخته می‌شود (conftest آن موقع mock گذاشته)؛ setenv بعدی بی‌اثر
 - فیکس: monkeypatch.setattr روی config_mod.settings.SMS_PROVIDER
 - اثر: 173 passed / 0 failed
+
+---
+## 42) گام 22 — B17 فاز ۲: Android SDK روی mirror و APK واقعی
+- JDK 17 (winget) + cmdline-tools از Tencent mirror + لایسنس/پکیج‌های دستی (platform-tools/build-tools/platforms)
+- init.gradle سراسری: جایگزینی مخزن‌های بلاک‌شده با aliyun روی همه buildها شامل composite فلاتر تولز + پچ مستقیم settings آن
+- mirrorهای gradle اپ (aliyun + wrapper tencent) —dl.google.com در شبکه بلاک است
+- mobile/.env با IP LAN (192.168.8.39)؛ سرور 0.0.0.0؛ فایروال 8000
+- خروجی: app-release.apk نصب روی گوشی واقعی
