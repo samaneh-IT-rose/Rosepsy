@@ -1,6 +1,7 @@
-﻿from fastapi.testclient import TestClient
+from fastapi.testclient import TestClient
 
 import app.api.auth as auth_mod
+import app.core.config as config_mod
 import app.services.sms as sms_mod
 from app.main import app
 from app.services.sms import DevFixedSmsSender
@@ -12,11 +13,16 @@ def _fixed_sender() -> DevFixedSmsSender:
     return DevFixedSmsSender("123456")
 
 
-def test_dev_fixed_code_accepted(monkeypatch):
-    """In dev_fixed mode, the known code signs the user in without the log."""
-    monkeypatch.setenv("SMS_PROVIDER", "dev_fixed")
+def _enable_dev_fixed(monkeypatch):
+    """Patch the CACHED settings object (env var changes have no effect on it)."""
+    monkeypatch.setattr(config_mod.settings, "SMS_PROVIDER", "dev_fixed")
     monkeypatch.setattr(sms_mod, "get_sms_sender", _fixed_sender)
     monkeypatch.setattr(auth_mod, "get_sms_sender", _fixed_sender)
+
+
+def test_dev_fixed_code_accepted(monkeypatch):
+    """In dev_fixed mode, the known code signs the user in without the log."""
+    _enable_dev_fixed(monkeypatch)
 
     r = client.post("/api/v1/auth/otp/request", json={"phone": "09129990001"})
     assert r.status_code == 200
@@ -30,9 +36,7 @@ def test_dev_fixed_code_accepted(monkeypatch):
 
 
 def test_wrong_code_still_rejected_in_dev_fixed(monkeypatch):
-    monkeypatch.setenv("SMS_PROVIDER", "dev_fixed")
-    monkeypatch.setattr(sms_mod, "get_sms_sender", _fixed_sender)
-    monkeypatch.setattr(auth_mod, "get_sms_sender", _fixed_sender)
+    _enable_dev_fixed(monkeypatch)
 
     r = client.post("/api/v1/auth/otp/request", json={"phone": "09129990002"})
     v = client.post(

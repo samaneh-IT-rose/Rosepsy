@@ -500,3 +500,9 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - فیکس: در auth.py وقتی ENV=dev و SMS_PROVIDER=dev_fixed، خود کد ثابت ساخته و هش می‌شود
 - اثر: verify با 123456 موفق؛ تست‌های mock-provider دست‌نخورده (مسیر else)
 - درس: sender فقط transport است؛ تولید کد در لایه auth می‌ماند — تغییر سیاست کد باید در همان لایه باشد
+
+---
+## 41) فیکس تست dev_fixed: پچ آبجکت کش‌شده settings نه env var
+- ریشه: settings با lru_cache هنگام import ساخته می‌شود (conftest آن موقع mock گذاشته)؛ setenv بعدی بی‌اثر
+- فیکس: monkeypatch.setattr روی config_mod.settings.SMS_PROVIDER
+- اثر: 173 passed / 0 failed
