@@ -520,3 +520,11 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - mirrorهای gradle اپ (aliyun + wrapper tencent) —dl.google.com در شبکه بلاک است
 - mobile/.env با IP LAN (192.168.8.39)؛ سرور 0.0.0.0؛ فایروال 8000
 - خروجی: app-release.apk نصب روی گوشی واقعی
+
+---
+## 42) گام 22 — Android SDK با mirror و APK واقعی
+- init.gradle سراسری add-only (aliyun اول) — نسخه remove دار crash می‌داد
+- cmdline-tools از Tencent mirror؛ پکیج‌های SDK با الگوی شل از روی listing واقعی mirror
+- mirrorهای gradle اپ (aliyun) + wrapper tencent — dl.google.com بلاک است
+- mobile/.env با IP LAN؛ سرور 0.0.0.0؛ فایروال 8000
+- خروجی: app-release.apk نصب روی گوشی واقعی
