@@ -506,3 +506,9 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - ریشه: settings با lru_cache هنگام import ساخته می‌شود (conftest آن موقع mock گذاشته)؛ setenv بعدی بی‌اثر
 - فیکس: monkeypatch.setattr روی config_mod.settings.SMS_PROVIDER
 - اثر: 173 passed / 0 failed
+
+---
+## 41) فیکس تست dev_fixed: پچ آبجکت کش‌شده settings نه env var
+- ریشه: settings با lru_cache هنگام import ساخته می‌شود (conftest آن موقع mock گذاشته)؛ setenv بعدی بی‌اثر
+- فیکس: monkeypatch.setattr روی config_mod.settings.SMS_PROVIDER
+- اثر: 173 passed / 0 failed
