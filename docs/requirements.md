@@ -604,3 +604,13 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - vite proxy به بک‌اند 8000 — بدون CORS در dev
 - API Client با envelope-parsing و ApiException فارسی؛ توکن در localStorage
 - صفحات: ورود OTP دو مرحله‌ای، خانه (نوبت‌ها + اعلان‌ها)، خروج
+
+---
+## 49) گام 25 — فرانت وب React/Vite فاز ۱ (کامل)
+- web/: React 18 + Vite 5 + TS + TanStack Query + RTL فارسی (Vazirmatn)
+- Node 20 LTS از mirror (nodejs.org/tuna/npmmirror) + registry npmmirror
+- API client: ApiException class + envelope-parsing + توکن در localStorage
+- auth.ts → auth.tsx (JSX fix) + vite-env.d.ts
+- صفحات: ورود OTP دو مرحله‌ای، خانه (نوبت‌ها + اعلان‌ها)، خروج
+- vite proxy به بک‌اند 8000 — بدون CORS در dev
+- ورود OTP در مرورگر واقعی تست شد — موفق
