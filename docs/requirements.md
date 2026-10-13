@@ -614,3 +614,10 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - صفحات: ورود OTP دو مرحله‌ای، خانه (نوبت‌ها + اعلان‌ها)، خروج
 - vite proxy به بک‌اند 8000 — بدون CORS در dev
 - ورود OTP در مرورگر واقعی تست شد — موفق
+
+---
+## 50) گام 26 — فرانت وب فاز ۲: جلسات مشاور + پرونده مراجع
+- ConsultantEncounters.tsx: لیست جلسات مشاور از /encounters/mine
+- ConsultantRecord.tsx: نمایش پرونده از مسیر جلسه (/encounters/{id}/record)
+- Home.tsx: tabs شرطی بر اساس roles (فقط مشاور تب جلسات را می‌بیند)
+- api.ts: myEncounters / encounterRecord / me اضافه شد
