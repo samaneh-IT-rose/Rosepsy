@@ -560,3 +560,10 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - ریشه: flutter_tools/gradle مقدار buildToolsVersion=36.0.0 را post-evaluate روی اپ اعمال می‌کند؛ پین app بازنویسی می‌شد
 - فیکس: پچ مستقیم فایل(های) flutter SDK (dev machine — ثبت‌شده در docs)
 - اثر: APK با build-tools 35.0.0 (نصب‌شده از mirror) build می‌شود
+
+---
+## 43) فیکس نهایی build-tools: AGP 9.1 → 8.7.3
+- ریشه: AGP 9.1 (پیش‌فرض Flutter 3.47) build-tools 36 را الزام می‌کند و buildToolsVersion اپ را نادیده می‌گیرد؛ build-tools 36 ZIP روی هیچ mirror در دسترسی نبود (404 روی ۳ کاندیدا)
+- فیکس: AGP به 8.7.3 تنزل — سازگار با build-tools 35.0.0 (از mirror نصب‌شده)
+- اثر: APK با پشته کاملاً mirror-based build می‌شود
+- درس: در شبکه محدود، نسخه toolchain را با hardware موجود هم‌تراز کن، نه برعکس
