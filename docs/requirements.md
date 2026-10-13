@@ -574,3 +574,13 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - فیکس: compileSdk=35، targetSdk=35 در app/build.gradle.kts — سازگار با build-tools 35 و platform 35 نصب‌شده از mirror
 - اثر: APK با پشته کاملاً mirror-based build می‌شود
 - درس: در شبکه محدود، compileSdk را با پشته موجود هم‌تراز کن
+
+---
+## 46) B17 فاز ۱: کد کامل و commit شده؛ دموی مرورگر معوق (محیطی)
+- تحویل کد: اپ Flutter کامل (OTP/نوبت‌ها/اعلان‌ها/لاگ‌اوت) — analyze پاک، ۲ تست unit سبز، flutter build web موفق
+- چرخه تحویل web: backend/.env (dev_fixed 123456) + CORS فعال + سرور 8000 (0.0.0.0) + وب‌سرور 8080
+- معوق (محیطی): preflight pending در مرورگر سیستم — بررسی شد: CORS در کد موجود، API URL در build جدید صحیح؛ عوامل محیطی باقی (VPN اکستنشن گوگل / پروکسی / تنظیمات شبکه)
+- چک‌لیست ۳۰ ثانیه‌ای دمو: ① VPN خاموش ② backend 8000 (0.0.0.0) ③ python -m http.server 8080 در build/web ④ localhost:8080 + Ctrl+Shift+R ⑤ شماره تازه → 123456
+- APK اندروید: معوق به دلیل بلاک dl.google.com (build-tools 36 منتشر نشده + secure_storage 11.x SDK36) — با secure_storage 9.2.4 و AGP9+skip-flag برطرف‌پذیر پس از دسترسی شبکه؛ کد نیازی به تغییر ندارد
+- بک‌اند انتشار ۲ گام ۱ (خودکارسازی paid→پرونده→جلسه) قبلاً تحویل شد — 173 تست سبز
+- درس پایانی: در محیط شبکه محدود، دمو وب را با same-origin (سرور استاتیک روی همان پورت API یا پروکسی) انجام بده؛ flutter build web هیچ Android SDK لازم ندارد
