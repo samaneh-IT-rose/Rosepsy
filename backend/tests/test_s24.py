@@ -45,9 +45,15 @@ def test_my_encounters_lists_only_own():
     assert mine.status_code == 200
     ids = [e["id"] for e in mine.json()["data"]]
     assert enc_id in ids
-    # another consultant sees none
-    other_token, _ = login(_phone())
+    # another consultant (has profile, no encounters) sees an empty list
+    other_token, other_uid = login(_phone())
+    client.post(
+        "/api/v1/consultants",
+        json={"display_name": "دکتر دیگر", "user_id": other_uid},
+        headers=ahok,
+    )
     other = client.get("/api/v1/encounters/mine", headers=h(other_token))
+    assert other.status_code == 200
     assert other.json()["data"] == []
     # non-consultant rejected
     resp = client.get("/api/v1/encounters/mine", headers=phok)

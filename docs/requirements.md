@@ -591,3 +591,9 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - GET /encounters/{id}/record: پرونده مراجع از مسیر جلسه — با write_access_event (via=encounter)
 - scripts/seed_demo.py: داده دموی idempotent (admin/consultant/client + service + tariff + branch + consent version) — آماده برای هر دموی آینده
 - ۳ تست جدید (جمع 176)
+
+---
+## 48) فیکس تست encounters/mine: کاربر دیگر باید consultant profile داشته باشد
+- ریشه: تست «مشاور دیگر» کاربر بدون نقش/پروفایل می‌ساخت → 403 NOT_A_CONSULTANT → data=null
+- فیکس: ابتدا با admin پروفایل Consultant برای کاربر دیگر ساخته می‌شود، سپس لیست خالی بررسی می‌شود
+- اثر: 176 passed / 0 failed
