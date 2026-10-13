@@ -345,6 +345,58 @@ def record_submissions(
 # ---------- B15/B16: encounters and notes ----------
 
 
+
+
+@router.get("/encounters/mine")
+def my_encounters(
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Sessions of the logged-in consultant (B15/B16 readiness)."""
+    cons = user_is_consultant(db, user)
+    if cons is None:
+        return error_response("NOT_A_CONSULTANT", "کاربر جاری مشاور نیست", 403)
+    rows = (
+        db.execute(
+            select(Encounter)
+            .where(Encounter.consultant_id == cons.id)
+            .order_by(Encounter.start_at.desc())
+        )
+        .scalars()
+        .all()
+    )
+    return envelope(data=[_encounter_view(db, e) for e in rows])
+
+
+@router.get("/encounters/{encounter_id}/record")
+def encounter_record(
+    encounter_id: uuid.UUID,
+    request: Request,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Consultant reads the client record through the session link (B13)."""
+    e, err = _encounter_or_404(db, encounter_id)
+    if err:
+        return err
+    cons = user_is_consultant(db, user)
+    if cons is None or cons.id != e.consultant_id:
+        return error_response("FORBIDDEN", "فقط مشاور جلسه دسترسی دارد", 403)
+    record = _get_record(db, e.record_id)
+    if record is None:
+        return error_response("RECORD_NOT_FOUND", "پرونده یافت نشد", 404)
+    write_access_event(
+        db,
+        actor_user_id=user.id,
+        subject_user_id=record.user_id,
+        action="clinical.record.read",
+        allowed=True,
+        resource_type="clinical_record",
+        resource_id=record.id,
+        request_id=request_id_var.get(),
+        detail={"via": "encounter"},
+    )
+    return envelope(data=_record_data(db, record))
 class EncounterIn(BaseModel):
     record_id: uuid.UUID
     consultant_id: uuid.UUID

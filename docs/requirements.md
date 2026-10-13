@@ -584,3 +584,10 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - APK اندروید: معوق به دلیل بلاک dl.google.com (build-tools 36 منتشر نشده + secure_storage 11.x SDK36) — با secure_storage 9.2.4 و AGP9+skip-flag برطرف‌پذیر پس از دسترسی شبکه؛ کد نیازی به تغییر ندارد
 - بک‌اند انتشار ۲ گام ۱ (خودکارسازی paid→پرونده→جلسه) قبلاً تحویل شد — 173 تست سبز
 - درس پایانی: در محیط شبکه محدود، دمو وب را با same-origin (سرور استاتیک روی همان پورت API یا پروکسی) انجام بده؛ flutter build web هیچ Android SDK لازم ندارد
+
+---
+## 47) گام 24 — انتشار ۲ گام ۲: encounter APIs + demo seed
+- GET /encounters/mine: جلسات مشاور لاگین (فقط مشاور؛ غیرمشاور 403 NOT_A_CONSULTANT)
+- GET /encounters/{id}/record: پرونده مراجع از مسیر جلسه — با write_access_event (via=encounter)
+- scripts/seed_demo.py: داده دموی idempotent (admin/consultant/client + service + tariff + branch + consent version) — آماده برای هر دموی آینده
+- ۳ تست جدید (جمع 176)
