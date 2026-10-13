@@ -554,3 +554,9 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - mirrorهای gradle اپ (aliyun) + wrapper tencent — dl.google.com بلاک است
 - mobile/.env با IP LAN (192.168.8.39)؛ سرور 0.0.0.0؛ فایروال 8000 (admin rule)
 - خروجی: app-release.apk نصب و تست روی گوشی واقعی با کد OTP ثابت 123456
+
+---
+## 43) فیکس نهایی build-tools: منبع 36.0.0 در خود Flutter SDK بود
+- ریشه: flutter_tools/gradle مقدار buildToolsVersion=36.0.0 را post-evaluate روی اپ اعمال می‌کند؛ پین app بازنویسی می‌شد
+- فیکس: پچ مستقیم فایل(های) flutter SDK (dev machine — ثبت‌شده در docs)
+- اثر: APK با build-tools 35.0.0 (نصب‌شده از mirror) build می‌شود
