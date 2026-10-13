@@ -597,3 +597,10 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - ریشه: تست «مشاور دیگر» کاربر بدون نقش/پروفایل می‌ساخت → 403 NOT_A_CONSULTANT → data=null
 - فیکس: ابتدا با admin پروفایل Consultant برای کاربر دیگر ساخته می‌شود، سپس لیست خالی بررسی می‌شود
 - اثر: 176 passed / 0 failed
+
+---
+## 49) گام 25 — انتشار ۲ گام ۳: فرانت وب React/Vite (فاز ۱)
+- web/: React 18 + Vite + TS + TanStack Query + RTL فارسی + Vazirmatn
+- vite proxy به بک‌اند 8000 — بدون CORS در dev
+- API Client با envelope-parsing و ApiException فارسی؛ توکن در localStorage
+- صفحات: ورود OTP دو مرحله‌ای، خانه (نوبت‌ها + اعلان‌ها)، خروج
