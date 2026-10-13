@@ -567,3 +567,10 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - فیکس: AGP به 8.7.3 تنزل — سازگار با build-tools 35.0.0 (از mirror نصب‌شده)
 - اثر: APK با پشته کاملاً mirror-based build می‌شود
 - درس: در شبکه محدود، نسخه toolchain را با hardware موجود هم‌تراز کن، نه برعکس
+
+---
+## 44) فیکس نهایی build-tools: compileSdk/targetSdk به 35 پین شد
+- ریشه: Flutter 3.47 پیش‌فرض compileSdk 36 + build-tools 36 می‌خواهد؛ build-tools 36 و platform 36 هنوز منتشر نشده (404 در ۶ منبع)
+- فیکس: compileSdk=35، targetSdk=35 در app/build.gradle.kts — سازگار با build-tools 35 و platform 35 نصب‌شده از mirror
+- اثر: APK با پشته کاملاً mirror-based build می‌شود
+- درس: در شبکه محدود، compileSdk را با پشته موجود هم‌تراز کن
