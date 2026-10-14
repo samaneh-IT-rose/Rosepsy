@@ -1,0 +1,130 @@
+{
+ "otp_request": {
+  "status": 200,
+  "body": {
+   "data": {
+    "challenge_id": "01a1397b-2acd-7de8-a131-4ac52cfceea2",
+    "phone_masked": "+98912***000",
+    "expires_in_seconds": 120
+   },
+   "meta": {
+    "request_id": "060c0e32e9034b018ed1728e68014f96",
+    "api_version": "v1"
+   },
+   "errors": null
+  }
+ },
+ "verify": {
+  "status": 200,
+  "body": {
+   "data": {
+    "access_token": "7jqT1dDDcxdbmrY9BCV8daoupP-iB_lKJMRxwpNDTz8",
+    "token_type": "bearer",
+    "expires_at": "2026-10-21T08:15:37.702073+00:00",
+    "is_new_user": false,
+    "user": {
+     "id": "01a13972-9fa8-7ce1-99b0-2e16761f7878",
+     "phone": "+989120000000"
+    }
+   },
+   "meta": {
+    "request_id": "6c0681cf1ee942c3b82e1c275a77977c",
+    "api_version": "v1"
+   },
+   "errors": null
+  }
+ },
+ "services": {
+  "status": 200,
+  "body": {
+   "data": [
+    {
+     "id": "01a13975-54cf-7bd3-99a0-b46ecf15d87e",
+     "name": "جلسه دمو",
+     "specialty_id": null,
+     "duration_minutes": 45,
+     "session_type": "in_person",
+     "is_active": true
+    }
+   ],
+   "meta": {
+    "request_id": "f685da87b6d646d9b67dca513092e2a9",
+    "api_version": "v1"
+   },
+   "errors": null
+  }
+ },
+ "consultants": {
+  "status": 200,
+  "body": {
+   "data": [
+    {
+     "id": "01a13975-54bc-78b5-b191-606b1c023b4e",
+     "display_name": "دکتر دمو",
+     "specialty_id": null,
+     "status": "approved",
+     "booking_eligible": true
+    }
+   ],
+   "meta": {
+    "request_id": "22bb590d02a1439a9474f1d19343b3f7",
+    "api_version": "v1"
+   },
+   "errors": null
+  }
+ },
+ "my_appointments": {
+  "status": 200,
+  "body": {
+   "data": [],
+   "meta": {
+    "request_id": "7351bd7e12214fe696c54a40d3945784",
+    "api_version": "v1"
+   },
+   "errors": null
+  }
+ },
+ "my_consents": {
+  "status": 200,
+  "body": {
+   "data": [],
+   "meta": {
+    "request_id": "b75a9b5068724ed1939cf7a289e2e5b2",
+    "api_version": "v1"
+   },
+   "errors": null
+  }
+ },
+ "my_record": {
+  "status": 404,
+  "body": {
+   "data": null,
+   "meta": {
+    "request_id": "1803aba7bf404021beed8fed886b899a",
+    "api_version": "v1"
+   },
+   "errors": [
+    {
+     "code": "RECORD_NOT_FOUND",
+     "message": "پرونده‌ای برای شما ثبت نشده است"
+    }
+   ]
+  }
+ },
+ "availability": {
+  "status": 200,
+  "body": {
+   "data": {
+    "consultant_id": "01a13975-54bc-78b5-b191-606b1c023b4e",
+    "service_id": "01a13975-54cf-7bd3-99a0-b46ecf15d87e",
+    "duration_minutes": 45,
+    "dates": {}
+   },
+   "meta": {
+    "request_id": "d5d60798ad684fb9a86823acf1d4739a",
+    "api_version": "v1"
+   },
+   "errors": null
+  }
+ }
+}

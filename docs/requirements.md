@@ -621,3 +621,14 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - ConsultantRecord.tsx: نمایش پرونده از مسیر جلسه (/encounters/{id}/record)
 - Home.tsx: tabs شرطی بر اساس roles (فقط مشاور تب جلسات را می‌بیند)
 - api.ts: myEncounters / encounterRecord / me اضافه شد
+
+---
+## 51) گام 27 — فرانت وب فاز ۳: مسیر رزرو مراجع (بلاک ۱)
+- Booking.tsx: خدمات → مشاور → اسلات‌ها → hold → نوبت → سفارش (Idempotency-Key) → پرداخت → poll → callback شبیه‌سازی → فاکتور + PDF
+- App.tsx: تب‌های خانه/رزرو نوبت (Home دست‌نخورده)
+- api.ts: توابع booking/payment/invoice + احیای me/myEncounters/encounterRecord (بدهی فاز ۲) + auto-logout روی 401
+- Home.tsx: فیکس import useQueryClient (علت صفحه سفید)
+- ابزار: probe_api.py / dump_api.py / dump_rules.py / seed_rules.py (تقویم ۰۹–۱۷ مشاور دمو → ۱۴ روز اسلات)
+- کشف قرارداد: verify با challenge_id؛ توکن opaque در data.access_token؛ availability: {dates: {روز: [{start, end}]}}
+- رفتار dev درگاه: start قطعی نمی‌کند؛ فرانت پس از poll ناکام callback شبیه‌سازی می‌زند → paid (در درگاه واقعی D02 جای آن را callback درگاه می‌گیرد)
+- تست مرورگر: ورود کلاینت دمو → رزرو کامل تا paid

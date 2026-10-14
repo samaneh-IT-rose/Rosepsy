@@ -66,4 +66,53 @@ export const api = {
     >('/notifications'),
 
   markRead: (id: string) => request(`/notifications/${id}/read`, { method: 'POST' }),
+
+  listServices: () => request<any[]>('/services'),
+
+  listConsultants: () => request<any[]>('/consultants'),
+
+  availability: (consultantId: string, serviceId: string) =>
+    request<any>(`/consultants/${consultantId}/availability?service_id=${serviceId}`),
+
+  createHold: (body: { consultant_id: string; service_id: string; start_at: string }) =>
+    request<any>('/booking-holds', { method: 'POST', body: JSON.stringify(body) }),
+
+  createAppointment: (holdId: string) =>
+    request<any>('/appointments', {
+      method: 'POST',
+      body: JSON.stringify({ hold_id: holdId }),
+    }),
+
+  createOrder: (appointmentId: string, idempotencyKey: string) =>
+    request<any>('/orders', {
+      method: 'POST',
+      body: JSON.stringify({ appointment_id: appointmentId }),
+      headers: { 'Idempotency-Key': idempotencyKey },
+    }),
+
+  startPayment: (orderId: string) =>
+    request<any>('/payments/start', {
+      method: 'POST',
+      body: JSON.stringify({ order_id: orderId }),
+    }),
+
+  paymentCallback: (gatewayRef: string) =>
+    request<any>('/payments/callback', {
+      method: 'POST',
+      body: JSON.stringify({ gateway_ref: gatewayRef, result: 'success' }),
+    }),
+
+  getOrder: (orderId: string) => request<any>(`/orders/${orderId}`),
+
+  getInvoice: (invoiceId: string) => request<any>(`/invoices/${invoiceId}`),
+
+  invoicePdfUrl: (invoiceId: string) => `${BASE_URL}/invoices/${invoiceId}.pdf`,
+
+  me: () => request<any>('/me'),
+
+  myEncounters: () => request<any[]>('/encounters/mine'),
+
+  encounterRecord: (encounterId: string) =>
+    request<any>(`/encounters/${encounterId}/record`),
 };
+
