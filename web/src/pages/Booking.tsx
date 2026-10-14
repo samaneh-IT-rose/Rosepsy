@@ -113,8 +113,8 @@ export default function Booking() {
       if (paid) { await finishPaid(paid); setStage('پرداخت موفق'); }
       else {
         setStage('پرداخت تأیید نشد — درگاه آزمایشی');
-        try { await api.paymentCallback(findRef(ps) || ord.id); const o2 = await pollOrder(ord.id);
-          if (o2) { await finishPaid(o2); setStage('پرداخت موفق'); } else setError('پرداخت تأیید نشد');
+        try { const cb: any = await api.paymentCallback(findRef(ps) || ord.id); const iid: string | null = cb?.invoice_id || null; const o2 = await pollOrder(ord.id);
+          if (o2) { if (iid) { try { const inv: any = await api.getInvoice(iid); console.log('INVOICE', inv); setInvoice(inv); } catch { setInvoice({ id: iid }); } } else { await finishPaid(o2); } setStage('پرداخت موفق'); } else setError('پرداخت تأیید نشد');
         } catch (e: any) { setError('شبیه‌سازی درگاه: ' + e.message); }
       }
     } catch (e: any) {
@@ -202,4 +202,5 @@ export default function Booking() {
 function loadingDates(dates: Record<string, any>) {
   return false;
 }
+
 

@@ -632,3 +632,11 @@ Backend 345 (40%) · Frontend وب 195 (23%) · Flutter 50 (6%) · DevOps 60 (7%
 - کشف قرارداد: verify با challenge_id؛ توکن opaque در data.access_token؛ availability: {dates: {روز: [{start, end}]}}
 - رفتار dev درگاه: start قطعی نمی‌کند؛ فرانت پس از poll ناکام callback شبیه‌سازی می‌زند → paid (در درگاه واقعی D02 جای آن را callback درگاه می‌گیرد)
 - تست مرورگر: ورود کلاینت دمو → رزرو کامل تا paid
+
+---
+## 52) گام 28 — نمایش فاکتور از پاسخ callback + فیکس CI
+- Booking.tsx: invoice_id از پاسخ callback گرفته می‌شود (کشف قرارداد: callback → {order_status, invoice_id, fulfillment{record_created, encounter_created, reason}})؛ GET /orders فاکتور ندارد؛ GET /payments/{id} برای نقش عادی 403 — درست طبق سند
+- کارت فاکتور + دانلود PDF سبز شد؛ فاکتور دمو: INV-2026-000549 = 4,500,000 IRR منطبق با snapshot سفارش (B11)
+- fulfillment.reason=consent_required تأیید شد — پیوند بلاک ۲: پس از رضایت treatment باید record_created=true شود
+- CI: arvancloud از رانر گیت‌هاب نرسید (MinIO not healthy) → minio/minio رسمی هم pull access denied (محدودیت Docker Hub روی IPهای ابری) → quay.io/minio/minio (رجیستری رسمی دوم MinIO)
+- بدهی فنی جدید: فاویکون 404 در وب — فاز UI

@@ -33,7 +33,7 @@ jobs:
           --health-timeout 3s
           --health-retries 10
       minio:
-        image: minio/minio:latest
+        image: quay.io/minio/minio:latest
         ports: ["9000:9000"]
         env:
           MINIO_ROOT_USER: roz
@@ -61,4 +61,5 @@ jobs:
         run: ruff check .
       - name: Tests (pytest)
         run: pytest --cov=app --cov-report=term-missing
+
 
