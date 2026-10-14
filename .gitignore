@@ -42,3 +42,4 @@ docker-compose.override.yml
 
 # --- Backups ---
 backups/
+rose-clinic-backup.bundle
