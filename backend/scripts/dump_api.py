@@ -1,7 +1,11 @@
-import json, re, urllib.request
+import json
+import re
+import urllib.request
 
 oa = json.load(urllib.request.urlopen("http://localhost:8000/openapi.json"))
-pat = re.compile(r"hold|appointment|order|payment|invoice|service|availab|consultant|consent|clinical|encounter")
+pat = re.compile(
+    r"hold|appointment|order|payment|invoice|service|availab|consultant|consent|clinical|encounter"
+)
 paths = {k: v for k, v in oa["paths"].items() if pat.search(k)}
 
 refs = set()
@@ -15,7 +19,13 @@ for p, item in paths.items():
             op = {}
             if "summary" in item[m]:
                 op["summary"] = item[m]["summary"]
-            rb = item[m].get("requestBody", {}).get("content", {}).get("application/json", {}).get("schema", {})
+            rb = (
+                item[m]
+                .get("requestBody", {})
+                .get("content", {})
+                .get("application/json", {})
+                .get("schema", {})
+            )
             if "$ref" in rb:
                 name = rb["$ref"].split("/")[-1]
                 refs.add(name)

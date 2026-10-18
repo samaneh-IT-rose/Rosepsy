@@ -6,6 +6,7 @@ from sqlalchemy import (
     CheckConstraint,
     DateTime,
     ForeignKey,
+    Integer,
     Numeric,
     String,
     UniqueConstraint,
@@ -61,6 +62,11 @@ class Branch(Base):
     lat: Mapped[float] = mapped_column(Numeric(9, 6))
     lon: Mapped[float] = mapped_column(Numeric(9, 6))
     status: Mapped[str] = mapped_column(String(16), default="draft", index=True)
+    # Admin panel (doc s.6): grouping + legacy numeric id («شناسه جزئیات» appendix).
+    clinic_group_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid, ForeignKey("core.clinic_groups.id", ondelete="SET NULL")
+    )
+    legacy_code: Mapped[int | None] = mapped_column(Integer, index=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )

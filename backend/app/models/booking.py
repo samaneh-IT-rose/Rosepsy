@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, String, Uuid, func
+from sqlalchemy import DateTime, ForeignKey, Integer, String, Uuid, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -64,6 +64,15 @@ class Appointment(Base):
     price_snapshot: Mapped[dict | None] = mapped_column(JSONB)
     cancel_reason: Mapped[str | None] = mapped_column(String(300))
     cancelled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # ── Admin panel (doc s.5.3 «جدول خدمات کاربر») ──
+    # «شناسه» column: numeric session code (sequence booking.appointments_code_seq).
+    code: Mapped[int | None] = mapped_column(Integer, unique=True, index=True)
+    # Referral context: «شناسه ارجاع»، قرارداد، تعرفه کاربر و وضعیت ارجاع.
+    referral_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid, ForeignKey("core.referrals.id", ondelete="SET NULL"), index=True
+    )
+    # «کیس حاد» per session: no («خیر») | pending («در انتظار») | yes («بله»).
+    acute_status: Mapped[str | None] = mapped_column(String(12))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )

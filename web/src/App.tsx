@@ -1,13 +1,34 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from './lib/auth';
 import Login from './pages/Login';
 import Home from './pages/Home';
 import Booking from './pages/Booking';
+import AdminLayout from './pages/admin/AdminLayout';
+
+function isAdminHash() {
+  return window.location.hash.startsWith('#/admin');
+}
 
 export default function App() {
   const { signedIn, loading } = useAuth();
-  const [tab, setTab] = useState<'home' | 'booking'>('home');
+  const [adminMode, setAdminMode] = useState(isAdminHash());
+
+  useEffect(() => {
+    const onChange = () => setAdminMode(isAdminHash());
+    window.addEventListener('hashchange', onChange);
+    return () => window.removeEventListener('hashchange', onChange);
+  }, []);
+
   if (loading) return <div style={{ padding: 24 }}>در حال بارگذاری…</div>;
+
+  if (signedIn && adminMode) return <AdminLayout />;
+
+  return <UserApp />;
+}
+
+function UserApp() {
+  const { signedIn } = useAuth();
+  const [tab, setTab] = useState<'home' | 'booking'>('home');
   if (!signedIn) return <Login />;
   return (
     <div>

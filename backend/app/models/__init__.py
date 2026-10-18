@@ -1,3 +1,4 @@
+from app.models.admin import City, ClinicGroup, Province, Referral  # noqa: F401
 from app.models.audit import AccessEvent, AuditLog  # noqa: F401
 from app.models.availability import AvailabilityException, WeeklyRule  # noqa: F401
 from app.models.booking import Appointment, SlotClaim  # noqa: F401

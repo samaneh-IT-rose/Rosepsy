@@ -20,6 +20,11 @@ ROLES: list[tuple[str, str, str]] = [
     ("system_admin", "مدیر سامانه", "تعریف نقش، تنظیمات، پایش و ممیزی"),
     ("scientific_reviewer", "ناظر علمی", "تأیید محتوای حساس، کلید تست و متن تفسیر"),
     ("auditor_dpo", "حسابرس / DPO", "مشاهده لاگ و گزارش انطباق"),
+    (
+        "national_admin",
+        "ادمین ملی",
+        "مدیر عامل مجموعه راه زندگی رز سفید ـ دسترسی سراسری به پنل مدیریت",
+    ),
 ]
 
 PERMISSIONS: list[tuple[str, str]] = [
@@ -45,6 +50,12 @@ PERMISSIONS: list[tuple[str, str]] = [
     ("questionnaires.manage", "مدیریت پرسشنامه‌های پرونده"),
     ("encounters.manage", "زمان‌بندی و پایش جلسات"),
     ("notes.manage", "ثبت و تأیید یادداشت جلسه"),
+    # ── B42 admin panel (doc ساختاریافته) ──
+    ("admin.panel", "دسترسی به پنل مدیریت"),
+    ("users.manage", "مشاهده و ویرایش کاربران سامانه"),
+    ("users.switch_session", "ورود به حساب کاربران (تعویض نشست)"),
+    ("reports.read", "مشاهده گزارشات"),
+    ("logs.read", "مشاهده گزارش فعالیت کاربران"),
 ]
 
 GRANTS: dict[str, list[str]] = {
@@ -84,6 +95,27 @@ GRANTS: dict[str, list[str]] = {
         "questionnaires.manage",
         "encounters.manage",
         "notes.manage",
+        "admin.panel",
+        "users.manage",
+        "users.switch_session",
+        "reports.read",
+        "logs.read",
+    ],
+    "national_admin": [
+        "admin.panel",
+        "users.manage",
+        "users.switch_session",
+        "reports.read",
+        "logs.read",
+        "applicants.read",
+        "roles.read",
+        "consultants.read",
+        "clinics.manage",
+        "branches.manage",
+        "tariffs.manage",
+        "audit.access.read",
+        "records.read",
+        "encounters.manage",
     ],
 }
 

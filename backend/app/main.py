@@ -8,6 +8,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from app.api import (
+    admin,
     applicants,
     audit,
     auth,
@@ -122,6 +123,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 app.include_router(health.router)
 app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
 app.include_router(me.router, prefix=settings.API_V1_PREFIX)
+app.include_router(admin.router, prefix=settings.API_V1_PREFIX)
 app.include_router(applicants.router, prefix=settings.API_V1_PREFIX)
 app.include_router(roles.router, prefix=settings.API_V1_PREFIX)
 app.include_router(catalog.router, prefix=settings.API_V1_PREFIX)

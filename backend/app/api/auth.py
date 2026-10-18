@@ -139,6 +139,10 @@ def verify_otp(body: OtpVerifyIn, request: Request, db: Session = Depends(get_db
         db.add(user)
         db.flush()
         db.add(Profile(user_id=user.id))
+    # «آخرین ورود» of the admin users table (doc s.4.2) — every OTP verify is a
+    # login, including the very first one of a self-registered account. Accounts
+    # registered by سها without any OTP keep «ثبت نشده» until first login.
+    user.last_login_at = now
 
     session_ttl = timedelta(seconds=settings.AUTH_SESSION_TTL_SECONDS)
     ip = request.client.host if request.client else "-"
