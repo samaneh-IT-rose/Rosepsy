@@ -61,6 +61,20 @@
 - **وضعیت فعلی:** فایل ci.yml آماده (پایپلاین سه‌سرویسی)
 - **شرح حل:** خودکار پس از push — نیازی به کار اضافه نیست
 
+### ۲.۹) رفع خطای «Initialize containers» در CI
+- **دلیل معوق:** توکن فعلی GitHub فاقد `workflow` scope است؛ push هر تغییری در
+  `.github/workflows/*` رد می‌شود
+- **شرح مشکل:** سرویس `quay.io/minio/minio:latest` روی رانرهای GitHub با
+  «unauthorized» رد می‌شود و job از همان گام Initialize containers می‌افتد
+  (در اجراهای قبلی هم همین بود)
+- **راه‌حل آماده:** `docs/ci-workflow-fixed.yml` — MinIO از باینری رسمی
+  dl.min.io اجرا می‌شود (مستقل از رجیستری). کافی است محتوای آن جای
+  `.github/workflows/ci.yml` گذاشته و با توکن دارای workflow scope پush شود:
+  ```bash
+  cp docs/ci-workflow-fixed.yml .github/workflows/ci.yml
+  git add .github/workflows/ci.yml && git commit -m "ci: binary MinIO" && git push
+  ```
+
 ---
 
 ## ۳) موارد نیازمند کار ادامه (فازهای بعدی پروژه)

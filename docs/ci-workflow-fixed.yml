@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: roz
+          POSTGRES_USER: roz
+          POSTGRES_PASSWORD: roz_dev
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U roz"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+      minio:
+        image: quay.io/minio/minio:latest
+        ports: ["9000:9000"]
+        env:
+          MINIO_ROOT_USER: roz
+          MINIO_ROOT_PASSWORD: roz_dev_secret
+    env:
+      DATABASE_URL: postgresql+psycopg://roz:roz_dev@localhost:5432/roz
+      REDIS_URL: redis://localhost:6379/0
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements-dev.txt
+      - name: Wait for MinIO
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:9000/minio/health/live; then exit 0; fi
+            sleep 2
+          done
+          echo "MinIO not healthy" && exit 1
+      - name: Lint (ruff)
+        run: ruff check .
+      - name: Tests (pytest)
+        run: pytest --cov=app --cov-report=term-missing
+
+
