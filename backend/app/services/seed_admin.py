@@ -307,7 +307,6 @@ def seed_doc_samples(db: Session, consultant: Consultant, services: dict[str, Se
     ).scalar_one_or_none()
     if referral is None:
         referral = Referral(
-            code=100136613430,
             user_id=user_b.id,
             contract_title="مددجو",
             user_tariff=0,
