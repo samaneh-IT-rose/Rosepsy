@@ -242,7 +242,7 @@ def seed_services_and_consultant(db: Session) -> dict:
                 kind="degree",
                 title="کارشناسی ارشد روان‌شناسی بالینی",
                 license_number=f"LIC-{uuid.uuid4().hex[:8].upper()}",
-                status="approved",
+                status="verified",
             )
         )
         db.flush()
