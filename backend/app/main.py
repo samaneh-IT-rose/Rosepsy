@@ -20,6 +20,8 @@ from app.api import (
     clinics,
     consents,
     consultants,
+    contents,
+    courses,
     dashboards,
     discounts,
     feedback,
@@ -164,6 +166,8 @@ app.include_router(organizations.router, prefix=settings.API_V1_PREFIX)
 app.include_router(accounting.router, prefix=settings.API_V1_PREFIX)
 app.include_router(feedback.router, prefix=settings.API_V1_PREFIX)
 app.include_router(dashboards.router, prefix=settings.API_V1_PREFIX)
+app.include_router(contents.router, prefix=settings.API_V1_PREFIX)
+app.include_router(courses.router, prefix=settings.API_V1_PREFIX)
 app.include_router(invoices.router, prefix=settings.API_V1_PREFIX)
 app.include_router(notifications.router, prefix=settings.API_V1_PREFIX)
 app.include_router(files.router, prefix=settings.API_V1_PREFIX)

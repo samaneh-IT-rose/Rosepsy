@@ -126,6 +126,17 @@ def post_order_paid_journal(db: Session, order) -> JournalEntry | None:
                 source_type="order_topup",
                 source_id=order.id,
             )
+        if order.order_type == "course":
+            return post_journal(
+                db,
+                lines=[
+                    {"account_code": "1001", "debit": int(order.amount)},
+                    {"account_code": "4001", "credit": int(order.amount)},
+                ],
+                description="درآمد فروش دوره",
+                source_type="order_course",
+                source_id=order.id,
+            )
         if order.appointment_id is not None:
             return post_journal(
                 db,

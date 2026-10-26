@@ -333,6 +333,10 @@ def payments_callback(
                 if appt is not None and appt.status == "pending_payment":
                     appt.status = "confirmed"
                     fulfillment = fulfill_paid_appointment(db, appointment=appt)
+            elif order.order_type == "course":
+                from app.services.edu import fulfill_course_order
+
+                fulfillment = fulfill_course_order(db, order)
             from app.services.invoicing import create_invoice_for_order
 
             invoice = create_invoice_for_order(db, order)

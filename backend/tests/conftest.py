@@ -14,6 +14,21 @@ from app.services.sms import get_sms_sender
 
 SCHEMAS = ["core", "booking", "clinical", "finance", "content", "edu", "audit"]
 TABLES = [
+    "edu.certificates",
+    "edu.exam_answers",
+    "edu.exam_attempts",
+    "edu.exam_questions",
+    "edu.course_exams",
+    "edu.access_grants",
+    "edu.course_enrollments",
+    "edu.lesson_progress",
+    "edu.lesson_versions",
+    "edu.lessons",
+    "edu.course_modules",
+    "edu.courses",
+    "content.content_topics",
+    "content.content_revisions",
+    "content.contents",
     "finance.invoice_items",
     "finance.invoices",
     "finance.payments",
@@ -148,7 +163,8 @@ def _cleanup() -> None:
         rows = conn.execute(
             text(
                 "SELECT table_schema || '.' || table_name FROM information_schema.tables "
-                "WHERE table_schema IN ('core','booking','clinical','finance','audit')"
+                "WHERE table_schema IN "
+                "('core','booking','clinical','finance','content','edu','audit')"
             )
         ).scalars().all()
         existing = set(rows)

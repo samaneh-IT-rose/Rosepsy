@@ -20,7 +20,22 @@ from app.models.clinical import (  # noqa: F401
     Submission,
 )
 from app.models.consents import Consent, ConsentVersion  # noqa: F401
+from app.models.content import Content, ContentRevision, ContentTopic  # noqa: F401
 from app.models.core import Applicant, AuthSession, OtpChallenge, Profile, User  # noqa: F401
+from app.models.edu import (  # noqa: F401
+    AccessGrant,
+    Certificate,
+    Course,
+    CourseEnrollment,
+    CourseExam,
+    CourseModule,
+    ExamAnswer,
+    ExamAttempt,
+    ExamQuestion,
+    Lesson,
+    LessonProgress,
+    LessonVersion,
+)
 from app.models.feedback import (  # noqa: F401
     SupportTicket,
     SurveyResponse,
