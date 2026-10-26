@@ -163,6 +163,19 @@ def pay_order_from_wallet(
             fulfillment = fulfill_paid_appointment(db, appointment=appt)
     invoice = create_invoice_for_order(db, order)
     invoice_id = str(invoice.id)
+    # B22: auto-post the balanced journal (wallet payment: liability out, revenue in)
+    from app.services.accounting import post_journal
+
+    post_journal(
+        db,
+        lines=[
+            {"account_code": "2100", "debit": int(order.amount)},
+            {"account_code": "4000", "credit": int(order.amount)},
+        ],
+        description="پرداخت خدمت از کیف پول",
+        source_type="order_wallet",
+        source_id=order.id,
+    )
     enqueue_event(
         db,
         user_id=order.user_id,

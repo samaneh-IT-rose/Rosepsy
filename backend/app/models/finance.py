@@ -292,3 +292,157 @@ class Refund(Base):
     executed_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
+
+
+# ────────────────────────────── B21 · Organizations ──────────────────────────────
+
+
+class Organization(Base):
+    """Contracting organization (B21): members get services with a payment share."""
+
+    __tablename__ = "organizations"
+    __table_args__ = {"schema": "finance"}
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid7)
+    name: Mapped[str] = mapped_column(String(150))
+    national_id: Mapped[str] = mapped_column(String(20), unique=True, index=True)
+    contact_name: Mapped[str | None] = mapped_column(String(120))
+    contact_phone: Mapped[str | None] = mapped_column(String(20))
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
+class OrganizationContract(Base):
+    """Contract version per organization (B21): payment share and validity window."""
+
+    __tablename__ = "organization_contracts"
+    __table_args__ = (
+        CheckConstraint(
+            "share_percent >= 0 AND share_percent <= 100",
+            name="ck_finance_org_contracts_share",
+        ),
+        {"schema": "finance"},
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid7)
+    organization_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("finance.organizations.id", ondelete="CASCADE"), index=True
+    )
+    title: Mapped[str] = mapped_column(String(200))
+    share_percent: Mapped[int] = mapped_column(Numeric(5, 2), default=0)
+    valid_from: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    valid_to: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
+class OrganizationMember(Base):
+    """Membership with validity window (B21): checked at service time, never retroactive."""
+
+    __tablename__ = "organization_members"
+    __table_args__ = {"schema": "finance"}
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid7)
+    organization_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("finance.organizations.id", ondelete="CASCADE"), index=True
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("core.users.id", ondelete="CASCADE"), index=True
+    )
+    valid_from: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    valid_to: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_by: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid, ForeignKey("core.users.id", ondelete="SET NULL")
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
+# ────────────────────────────── B22 · Accounting ──────────────────────────────
+
+
+class Account(Base):
+    """Chart of accounts (B22)."""
+
+    __tablename__ = "accounts"
+    __table_args__ = {"schema": "finance"}
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid7)
+    code: Mapped[str] = mapped_column(String(20), unique=True, index=True)
+    name: Mapped[str] = mapped_column(String(120))
+    kind: Mapped[str] = mapped_column(String(20))  # asset | liability | equity | revenue | expense
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
+class JournalEntry(Base):
+    """Balanced journal entry (B22): unique per financial event (source_type, source_id)."""
+
+    __tablename__ = "journal_entries"
+    __table_args__ = {"schema": "finance"}
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid7)
+    entry_no: Mapped[str] = mapped_column(String(30), unique=True, index=True)
+    description: Mapped[str | None] = mapped_column(String(300))
+    source_type: Mapped[str | None] = mapped_column(String(30), index=True)
+    source_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, index=True)
+    posted_by: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid, ForeignKey("core.users.id", ondelete="SET NULL")
+    )
+    posted_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
+class JournalLine(Base):
+    """Journal line (B22): exactly one of debit/credit is positive."""
+
+    __tablename__ = "journal_lines"
+    __table_args__ = (
+        CheckConstraint(
+            "(debit > 0 AND credit = 0) OR (debit = 0 AND credit > 0)",
+            name="ck_finance_journal_lines_one_side",
+        ),
+        {"schema": "finance"},
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid7)
+    entry_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("finance.journal_entries.id", ondelete="CASCADE"), index=True
+    )
+    account_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("finance.accounts.id", ondelete="RESTRICT"), index=True
+    )
+    debit: Mapped[int] = mapped_column(Numeric(14, 0), default=0)
+    credit: Mapped[int] = mapped_column(Numeric(14, 0), default=0)
+
+
+class Settlement(Base):
+    """Consultant settlement per period (B22): draft -> approved -> paid."""
+
+    __tablename__ = "settlements"
+    __table_args__ = {"schema": "finance"}
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid7)
+    consultant_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("core.consultants.id", ondelete="CASCADE"), index=True
+    )
+    period_from: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    period_to: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    gross_amount: Mapped[int] = mapped_column(Numeric(14, 0), default=0)
+    share_percent: Mapped[int] = mapped_column(Numeric(5, 2), default=0)
+    net_amount: Mapped[int] = mapped_column(Numeric(14, 0), default=0)
+    status: Mapped[str] = mapped_column(String(12), default="draft", index=True)
+    paid_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_by: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid, ForeignKey("core.users.id", ondelete="SET NULL")
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )

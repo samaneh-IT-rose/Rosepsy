@@ -8,6 +8,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from app.api import (
+    accounting,
     admin,
     applicants,
     audit,
@@ -19,13 +20,16 @@ from app.api import (
     clinics,
     consents,
     consultants,
+    dashboards,
     discounts,
+    feedback,
     files,
     health,
     invoices,
     me,
     notifications,
     orders,
+    organizations,
     pricing,
     refunds,
     roles,
@@ -156,6 +160,10 @@ app.include_router(orders.router, prefix=settings.API_V1_PREFIX)
 app.include_router(wallet.router, prefix=settings.API_V1_PREFIX)
 app.include_router(discounts.router, prefix=settings.API_V1_PREFIX)
 app.include_router(refunds.router, prefix=settings.API_V1_PREFIX)
+app.include_router(organizations.router, prefix=settings.API_V1_PREFIX)
+app.include_router(accounting.router, prefix=settings.API_V1_PREFIX)
+app.include_router(feedback.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dashboards.router, prefix=settings.API_V1_PREFIX)
 app.include_router(invoices.router, prefix=settings.API_V1_PREFIX)
 app.include_router(notifications.router, prefix=settings.API_V1_PREFIX)
 app.include_router(files.router, prefix=settings.API_V1_PREFIX)

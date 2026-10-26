@@ -21,16 +21,28 @@ from app.models.clinical import (  # noqa: F401
 )
 from app.models.consents import Consent, ConsentVersion  # noqa: F401
 from app.models.core import Applicant, AuthSession, OtpChallenge, Profile, User  # noqa: F401
+from app.models.feedback import (  # noqa: F401
+    SupportTicket,
+    SurveyResponse,
+    TicketMessage,
+)
 from app.models.files import File  # noqa: F401
 from app.models.finance import (  # noqa: F401
+    Account,
     Discount,
     DiscountRedemption,
     Invoice,
     InvoiceItem,
+    JournalEntry,
+    JournalLine,
     Order,
+    Organization,
+    OrganizationContract,
+    OrganizationMember,
     Payment,
     Refund,
     RefundRequest,
+    Settlement,
     Wallet,
     WalletEntry,
 )

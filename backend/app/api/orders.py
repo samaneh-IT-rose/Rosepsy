@@ -337,6 +337,10 @@ def payments_callback(
 
             invoice = create_invoice_for_order(db, order)
             invoice_id = str(invoice.id)
+        # B22: auto-post the balanced journal for this financial event (best-effort)
+        from app.services.accounting import post_order_paid_journal
+
+        post_order_paid_journal(db, order)
         enqueue_event(
             db,
             user_id=order.user_id,

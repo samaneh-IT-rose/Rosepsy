@@ -53,6 +53,9 @@ PERMISSIONS: list[tuple[str, str]] = [
     ("wallet.manage", "مدیریت کیف پول کاربران (شارژ و مشاهده)"),
     ("discounts.manage", "مدیریت کدهای تخفیف"),
     ("refunds.manage", "بررسی، تأیید و اجرای استرداد وجه"),
+    ("organizations.manage", "مدیریت سازمان‌ها، قرارداد و اعضا"),
+    ("accounting.manage", "مدیریت کدینگ، اسناد حسابداری و تسویه"),
+    ("tickets.manage", "پیگیری تیکت‌های پشتیبانی"),
     # ── B42 admin panel (doc ساختاریافته) ──
     ("admin.panel", "دسترسی به پنل مدیریت"),
     ("users.manage", "مشاهده و ویرایش کاربران سامانه"),
@@ -67,6 +70,7 @@ GRANTS: dict[str, list[str]] = {
         "applicants.read",
         "records.manage",
         "encounters.manage",
+        "tickets.manage",
     ],
     "consultant": [
         "availability.manage",
@@ -79,6 +83,8 @@ GRANTS: dict[str, list[str]] = {
         "wallet.manage",
         "discounts.manage",
         "refunds.manage",
+        "organizations.manage",
+        "accounting.manage",
     ],
     "auditor_dpo": ["audit.access.read"],
     "system_admin": [
@@ -100,6 +106,9 @@ GRANTS: dict[str, list[str]] = {
         "wallet.manage",
         "discounts.manage",
         "refunds.manage",
+        "organizations.manage",
+        "accounting.manage",
+        "tickets.manage",
         "consents.manage",
         "audit.access.read",
         "records.read",

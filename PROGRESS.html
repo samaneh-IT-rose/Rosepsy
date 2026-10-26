@@ -72,14 +72,14 @@ tbody tr:last-child td{border-bottom:none}
 <div class="hero">
   <h1>ردیاب پیشرفت پروژه Rosepsy</h1>
   <p>سامانه یکپارچه خدمات مشاوره و آموزش روان‌شناسی کلینیک رز — مقایسه زندهٔ اجرا با سند جامع v0.2</p>
-  <span class="badge">آخرین به‌روزرسانی: ۲۶ اکتبر ۲۰۲۶ (۴ آبان ۱۴۰۵) · Commit دستهٔ ۱ — انتشار ۳</span>
+  <span class="badge">آخرین به‌روزرسانی: ۲۶ اکتبر ۲۰۲۶ (۴ آبان ۱۴۰۵) · Commit دستهٔ ۲ — انتشار ۳</span>
 </div>
 
 <div class="kpis">
-  <div class="kpi"><strong>۵۹٪</strong><small>پیشرفت وزنی کل پروژه (۸۶۵ نفرروز سند)</small></div>
-  <div class="kpi teal"><strong>۲۵ / ۴۲</strong><small>قلم بک‌لاگ کامل (B42 اضافی هم کامل)</small></div>
-  <div class="kpi green"><strong>۲۱۳</strong><small>تست خودکار سبز (۱۹۱ قبلی + ۲۲ جدید)</small></div>
-  <div class="kpi gold"><strong>۱۹٪</strong><small>پیشرفت انتشار ۳ (۴۸ از ۲۵۳ نفرروز)</small></div>
+  <div class="kpi"><strong>۶۹٪</strong><small>پیشرفت وزنی کل پروژه (۸۶۵ نفرروز سند)</small></div>
+  <div class="kpi teal"><strong>۲۹ / ۴۲</strong><small>قلم بک‌لاگ کامل (B42 اضافی هم کامل)</small></div>
+  <div class="kpi green"><strong>۲۲۶</strong><small>تست خودکار سبز (۱۹۱ قبلی + ۳۵ جدید)</small></div>
+  <div class="kpi gold"><strong>۵۵٪</strong><small>پیشرفت انتشار ۳ (۱۳۹ از ۲۵۳ نفرروز)</small></div>
 </div>
 
 <div class="section">
@@ -97,8 +97,8 @@ tbody tr:last-child td{border-bottom:none}
   </div>
   <div class="bar-row">
     <span class="lbl">انتشار ۳ — مالی و آموزش <small>B18–B24، B33–B36 · ۲۵۳ نفرروز</small></span>
-    <span class="bar low"><i style="width:19%"></i></span>
-    <span class="pct">۱۹٪</span>
+    <span class="bar low"><i style="width:55%"></i></span>
+    <span class="pct">۵۵٪</span>
   </div>
   <div class="bar-row">
     <span class="lbl">انتشار ۴ — ارزیابی و AI <small>B25، B26، B37 · ۸۷ نفرروز</small></span>
@@ -139,10 +139,10 @@ tbody tr:last-child td{border-bottom:none}
       <tr><td class="code">B18</td><td>کیف پول</td><td>۳</td><td><span class="st ui">بک‌اند کامل</span></td><td>ledger+قفل ردیفی+شارژ درگاهی+پرداخت از اعتبار — ۸ تست</td></tr>
       <tr><td class="code">B19</td><td>کد تخفیف</td><td>۳</td><td><span class="st ui">بک‌اند کامل</span></td><td>سقف کل/کاربر با lock؛ ادغام در سفارش — ۷ تست</td></tr>
       <tr><td class="code">B20</td><td>استرداد وجه</td><td>۳</td><td><span class="st ui">بک‌اند کامل</span></td><td>چرخه submitted→executed؛ واریز به کیف پول — ۷ تست</td></tr>
-      <tr><td class="code">B21</td><td>سازمان‌ها</td><td>۳</td><td><span class="st next">⏳ در حال پیاده‌سازی</span></td><td>—</td></tr>
-      <tr><td class="code">B22</td><td>حسابداری/تسویه</td><td>۳</td><td><span class="st next">⏳ در حال پیاده‌سازی</span></td><td>—</td></tr>
-      <tr><td class="code">B23</td><td>نظرسنجی/تیکت</td><td>۳</td><td><span class="st next">⏳ در حال پیاده‌سازی</span></td><td>—</td></tr>
-      <tr><td class="code">B24</td><td>داشبورد مدیریتی</td><td>۳</td><td><span class="st next">⏳ در حال پیاده‌سازی</span></td><td>—</td></tr>
+      <tr><td class="code">B21</td><td>سازمان‌ها</td><td>۳</td><td><span class="st ui">بک‌اند کامل</span></td><td>قرارداد + عضویت با اعتبار زمانی — ۳ تست</td></tr>
+      <tr><td class="code">B22</td><td>حسابداری/تسویه</td><td>۳</td><td><span class="st ui">بک‌اند کامل</span></td><td>سند متوازن + idempotent به رویداد مالی + خودنویسی در پرداخت — ۵ تست</td></tr>
+      <tr><td class="code">B23</td><td>نظرسنجی/تیکت</td><td>۳</td><td><span class="st ui">بک‌اند کامل</span></td><td>بدون افشای داده درمانی؛ گردش کار پشتیبانی — ۴ تست</td></tr>
+      <tr><td class="code">B24</td><td>داشبورد مدیریتی</td><td>۳</td><td><span class="st ui">بک‌اند کامل</span></td><td>KPI رزرو/فروش/۷روز/خدمات برتر — ۲ تست</td></tr>
       <tr><td class="code">B25</td><td>پیشنهاد مشاور AI</td><td>۴</td><td><span class="st next">⏳</span></td><td>نیازمند تصمیم D07</td></tr>
       <tr><td class="code">B26</td><td>خلاصه/پیش‌نویس AI</td><td>۴</td><td><span class="st next">⏳</span></td><td>نیازمند تصمیم D07</td></tr>
       <tr><td class="code">B27</td><td>ML/ارزیابی مدل</td><td>۵</td><td><span class="st next">⏳</span></td><td>—</td></tr>
@@ -172,15 +172,11 @@ tbody tr:last-child td{border-bottom:none}
     <div class="card">
       <h3>در دست اجرا — انتشار ۳ (مالی و آموزش · ۲۵۳ نفرروز)</h3>
       <ul>
-        <li>B21 سازمان‌ها، قرارداد، اعضا و سهم پرداخت (۲۲ نفرروز)</li>
-        <li>B22 کدینگ، سند حسابداری، تسویه و مغایرت (۳۴ نفرروز)</li>
-        <li>B23 نظرسنجی، شکایت و تیکت پشتیبانی (۱۳ نفرروز)</li>
-        <li>B24 داشبورد رزرو/فروش/عملکرد شعب (۲۲ نفرروز)</li>
         <li>B33 CMS مقاله/خبر/پادکست/ویدئو + صفحات عمومی (۲۳ نفرروز)</li>
         <li>B34 دوره و درس ویدئویی/PDF (۳۳ نفرروز)</li>
         <li>B35 فروش و ثبت‌نام دوره (۲۳ نفرروز)</li>
         <li>B36 آزمون پایان دوره و گواهی (۲۷ نفرروز)</li>
-        <li>UI وب برای ماژول‌های مالی و آموزشی</li>
+        <li>UI وب برای ماژول‌های مالی و آموزشی (B18–B24 آمادهٔ اتصال)</li>
       </ul>
     </div>
     <div class="card">
@@ -201,6 +197,14 @@ tbody tr:last-child td{border-bottom:none}
 <div class="section">
   <h2>تاریخچه به‌روزرسانی‌ها</h2>
   <ul class="log">
+    <li>
+      <span class="t">۲۶ اکتبر ۲۰۲۶ — دستهٔ ۲ (انتشار ۳)</span>
+      <b>B21 سازمان + B22 حسابداری + B23 نظرسنجی/تیکت + B24 داشبورد</b> —
+      مهاجرت 0016، سند حسابداری خودنویس در هر پرداخت موفق (نقدی/کیف پول/شارژ)،
+      عضویت سازمانی با اعتبار زمانی، گردش کار تیکت بدون افشای داده درمانی،
+      داشبورد KPI با مجوز reports.read.
+      <b>۱۳ تست جدید — کل ۲۲۶ تست سبز.</b>
+    </li>
     <li>
       <span class="t">۲۶ اکتبر ۲۰۲۶ — دستهٔ ۱ (انتشار ۳)</span>
       <b>خلاصه وضعیت اولیه + B18 کیف پول + B19 تخفیف + B20 استرداد</b> —
