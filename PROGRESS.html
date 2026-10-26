@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ردیاب پیشرفت پروژه Rosepsy — سامانه یکپارچه کلینیک رز</title>
+<style>
+:root{
+  --bg:#f4f6f8;--paper:#fff;--ink:#1b3044;--muted:#607385;--line:#e1e8ed;
+  --rose:#94365e;--rose-dark:#6f284b;--rose-light:#faedf3;
+  --teal:#147d78;--teal-light:#eaf7f5;
+  --gold:#b88538;--gold-light:#fff6e7;
+  --green:#2e9e5b;--green-light:#e6f6ec;
+  --red:#c53939;--red-light:#fdecec;
+  --blue:#2c4d71;--blue-light:#edf4fb;
+  --shadow:0 14px 38px rgba(24,48,68,.07);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Tahoma,"Segoe UI",Arial,sans-serif;font-size:13px;line-height:1.9}
+.wrap{max-width:1200px;margin:auto;padding:22px clamp(12px,3vw,40px) 60px}
+.hero{padding:clamp(22px,4vw,42px);border-radius:20px;background:linear-gradient(125deg,#5d294c,#913857 62%,#ad5668);color:#fff;box-shadow:0 18px 40px rgba(92,40,75,.18)}
+.hero h1{margin:0 0 6px;font-size:clamp(20px,3vw,30px)}
+.hero p{margin:0;color:#ffedf4;font-size:12.5px}
+.badge{display:inline-block;margin-top:12px;padding:3px 12px;border:1px solid rgba(255,255,255,.3);border-radius:999px;background:rgba(255,255,255,.12);font-size:11px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:16px 0}
+.kpi{padding:16px;border:1px solid var(--line);border-radius:15px;background:#fff;box-shadow:var(--shadow)}
+.kpi strong{display:block;color:var(--rose-dark);font-size:clamp(20px,2.6vw,30px);line-height:1.5}
+.kpi small{color:var(--muted)}
+.kpi.teal strong{color:var(--teal)}
+.kpi.gold strong{color:var(--gold)}
+.kpi.green strong{color:var(--green)}
+.section{margin-top:16px;padding:clamp(16px,3vw,30px);border:1px solid var(--line);border-radius:16px;background:var(--paper);box-shadow:var(--shadow)}
+.section h2{margin:0 0 4px;font-size:19px;color:var(--rose-dark)}
+.section .sub{margin:0 0 14px;color:var(--muted);font-size:11px}
+.bar-row{display:grid;grid-template-columns:210px 1fr 130px;gap:10px;align-items:center;margin:10px 0}
+.bar-row .lbl{font-weight:bold;font-size:12px}
+.bar-row .lbl small{display:block;color:var(--muted);font-weight:normal;font-size:10px}
+.bar{height:16px;border-radius:999px;background:#eef2f6;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#94365e,#c05c85);transition:width .6s ease}
+.bar.done i{background:linear-gradient(90deg,#2e9e5b,#5cc584)}
+.bar.low i{background:linear-gradient(90deg,#b88538,#d9ae6a)}
+.pct{font-weight:bold;color:var(--rose-dark);font-size:12px;text-align:left}
+table{width:100%;border-collapse:collapse;background:#fff;font-size:11.5px;line-height:1.8}
+th,td{padding:8px 9px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}
+thead th{background:#f0f3f6;color:#385067;white-space:nowrap}
+tbody tr:nth-child(even){background:#fcfdfe}
+tbody tr:last-child td{border-bottom:none}
+.code{font-weight:bold;color:var(--rose-dark);white-space:nowrap}
+.st{display:inline-block;padding:1px 9px;border-radius:999px;font-size:10px;font-weight:bold;white-space:nowrap}
+.st.done{background:var(--green-light);color:#1f7a44}
+.st.part{background:var(--gold-light);color:#876020}
+.st.next{background:#eef2f6;color:#42576b}
+.st.ui{background:var(--blue-light);color:var(--blue)}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.card{padding:13px 16px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.card h3{margin:0 0 6px;font-size:13.5px;color:var(--rose-dark)}
+.card ul{margin:5px 0;padding-right:18px}
+.card li{margin:3px 0}
+.log{list-style:none;padding:0;margin:0}
+.log li{position:relative;padding:10px 30px 10px 0;margin:0;border-bottom:1px dashed var(--line)}
+.log li:last-child{border-bottom:none}
+.log li::before{content:"";position:absolute;right:5px;top:17px;width:11px;height:11px;border-radius:50%;background:var(--rose);box-shadow:0 0 0 3px #fff,0 0 0 4px var(--rose-light)}
+.log .t{color:var(--muted);font-size:10.5px;display:block}
+.log b{color:var(--rose-dark)}
+.footer{margin-top:22px;color:var(--muted);text-align:center;font-size:10.5px}
+@media (max-width:760px){.kpis{grid-template-columns:repeat(2,1fr)}.bar-row{grid-template-columns:1fr;gap:4px}.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <h1>ردیاب پیشرفت پروژه Rosepsy</h1>
+  <p>سامانه یکپارچه خدمات مشاوره و آموزش روان‌شناسی کلینیک رز — مقایسه زندهٔ اجرا با سند جامع v0.2</p>
+  <span class="badge">آخرین به‌روزرسانی: ۲۶ اکتبر ۲۰۲۶ (۴ آبان ۱۴۰۵) · Commit دستهٔ ۱ — انتشار ۳</span>
+</div>
+
+<div class="kpis">
+  <div class="kpi"><strong>۵۹٪</strong><small>پیشرفت وزنی کل پروژه (۸۶۵ نفرروز سند)</small></div>
+  <div class="kpi teal"><strong>۲۵ / ۴۲</strong><small>قلم بک‌لاگ کامل (B42 اضافی هم کامل)</small></div>
+  <div class="kpi green"><strong>۲۱۳</strong><small>تست خودکار سبز (۱۹۱ قبلی + ۲۲ جدید)</small></div>
+  <div class="kpi gold"><strong>۱۹٪</strong><small>پیشرفت انتشار ۳ (۴۸ از ۲۵۳ نفرروز)</small></div>
+</div>
+
+<div class="section">
+  <h2>پیشرفت انتشارها (نقشه راه سند §۰۲)</h2>
+  <p class="sub">درصد وزنی بر مبنای نفرروز هر قلم در سند؛ وضعیت «بک‌اند کامل» یعنی API + داده + تست سبز.</p>
+  <div class="bar-row">
+    <span class="lbl">انتشار ۱ — هسته عملیاتی <small>B01–B12، B31، B32، B38–B41 · ۳۵۴ نفرروز</small></span>
+    <span class="bar done"><i style="width:98%"></i></span>
+    <span class="pct">۹۸٪</span>
+  </div>
+  <div class="bar-row">
+    <span class="lbl">انتشار ۲ — خدمات حرفه‌ای <small>B13–B17 · ۱۳۵ نفرروز</small></span>
+    <span class="bar"><i style="width:90%"></i></span>
+    <span class="pct">۹۰٪</span>
+  </div>
+  <div class="bar-row">
+    <span class="lbl">انتشار ۳ — مالی و آموزش <small>B18–B24، B33–B36 · ۲۵۳ نفرروز</small></span>
+    <span class="bar low"><i style="width:19%"></i></span>
+    <span class="pct">۱۹٪</span>
+  </div>
+  <div class="bar-row">
+    <span class="lbl">انتشار ۴ — ارزیابی و AI <small>B25، B26، B37 · ۸۷ نفرروز</small></span>
+    <span class="bar"><i style="width:0%"></i></span>
+    <span class="pct">۰٪</span>
+  </div>
+  <div class="bar-row">
+    <span class="lbl">انتشار ۵ — بلوغ داده <small>B27، B28 · ۳۶ نفرروز</small></span>
+    <span class="bar"><i style="width:0%"></i></span>
+    <span class="pct">۰٪</span>
+  </div>
+</div>
+
+<div class="section">
+  <h2>وضعیت بک‌لاگ B01–B42</h2>
+  <p class="sub">✅ کامل · 🔶 جزئی · ⏳ انتشار بعدی · 🖥 بک‌اند کامل، UI وب/موبایل باقی</p>
+  <div style="overflow-x:auto">
+  <table>
+    <thead><tr><th>کد</th><th>قلم</th><th>انتشار</th><th>وضعیت</th><th>یادداشت</th></tr></thead>
+    <tbody>
+      <tr><td class="code">B01</td><td>پوسته/health/خطا</td><td>۱</td><td><span class="st done">کامل</span></td><td>request-id + لاگ JSON</td></tr>
+      <tr><td class="code">B02</td><td>ورود OTP</td><td>۱</td><td><span class="st done">کامل</span></td><td>TTL120s/۵تلاش/قفل/Rate-limit</td></tr>
+      <tr><td class="code">B03</td><td>متقاضیان</td><td>۱</td><td><span class="st done">کامل</span></td><td>تکراری‌یابی دولایه</td></tr>
+      <tr><td class="code">B04</td><td>RBAC + ممیزی</td><td>۱</td><td><span class="st done">کامل</span></td><td>403+audit؛ ماتریس تست</td></tr>
+      <tr><td class="code">B05</td><td>مشاوران و مدارک</td><td>۱</td><td><span class="st done">کامل</span></td><td>eligibility = approved+مدرک</td></tr>
+      <tr><td class="code">B06</td><td>خدمات/تخصص‌ها</td><td>۱</td><td><span class="st done">کامل</span></td><td>مدت&gt;0 با CheckConstraint</td></tr>
+      <tr><td class="code">B07</td><td>تعرفه نسخه‌دار</td><td>۱</td><td><span class="st done">کامل</span></td><td>بازه نیمه‌باز + quote زمانی</td></tr>
+      <tr><td class="code">B08</td><td>تقویم/اسلات</td><td>۱</td><td><span class="st done">کامل</span></td><td>مولد خالص + TZ تهران</td></tr>
+      <tr><td class="code">B09</td><td>Hold/نوبت</td><td>۱</td><td><span class="st done">کامل</span></td><td>Exclusion Constraint ضدتعارض</td></tr>
+      <tr><td class="code">B10</td><td>سفارش/پرداخت</td><td>۱</td><td><span class="st done">کامل</span></td><td>Idempotency-Key + callback noop + تخفیف (B19)</td></tr>
+      <tr><td class="code">B11</td><td>فاکتور/PDF</td><td>۱</td><td><span class="st done">کامل</span></td><td>شماره سکانسی؛ PDF فارسی در فاز UI</td></tr>
+      <tr><td class="code">B12</td><td>اعلان Outbox</td><td>۱</td><td><span class="st done">کامل</span></td><td>همان‌تراکنش paid/cancel</td></tr>
+      <tr><td class="code">B13</td><td>پرونده دیجیتال</td><td>۲</td><td><span class="st done">کامل</span></td><td>هر خواندن = access_event</td></tr>
+      <tr><td class="code">B14</td><td>پرسشنامه نسخه‌دار</td><td>۲</td><td><span class="st done">کامل</span></td><td>پاسخ قفل به نسخه</td></tr>
+      <tr><td class="code">B15</td><td>یادداشت/اصلاحیه</td><td>۲</td><td><span class="st done">کامل</span></td><td>تأیید→منجمد</td></tr>
+      <tr><td class="code">B16</td><td>پایش جلسه</td><td>۲</td><td><span class="st done">کامل</span></td><td>وضعیت جدا از محتوا</td></tr>
+      <tr><td class="code">B17</td><td>اپ Flutter</td><td>۲</td><td><span class="st part">جزئی</span></td><td>ورود/نوبت/اعلان/پرداخت آماده؛ APK قبلاً روی دستگاه واقعی؛ دمو مرورگر معوق (محیطی)</td></tr>
+      <tr><td class="code">B18</td><td>کیف پول</td><td>۳</td><td><span class="st ui">بک‌اند کامل</span></td><td>ledger+قفل ردیفی+شارژ درگاهی+پرداخت از اعتبار — ۸ تست</td></tr>
+      <tr><td class="code">B19</td><td>کد تخفیف</td><td>۳</td><td><span class="st ui">بک‌اند کامل</span></td><td>سقف کل/کاربر با lock؛ ادغام در سفارش — ۷ تست</td></tr>
+      <tr><td class="code">B20</td><td>استرداد وجه</td><td>۳</td><td><span class="st ui">بک‌اند کامل</span></td><td>چرخه submitted→executed؛ واریز به کیف پول — ۷ تست</td></tr>
+      <tr><td class="code">B21</td><td>سازمان‌ها</td><td>۳</td><td><span class="st next">⏳ در حال پیاده‌سازی</span></td><td>—</td></tr>
+      <tr><td class="code">B22</td><td>حسابداری/تسویه</td><td>۳</td><td><span class="st next">⏳ در حال پیاده‌سازی</span></td><td>—</td></tr>
+      <tr><td class="code">B23</td><td>نظرسنجی/تیکت</td><td>۳</td><td><span class="st next">⏳ در حال پیاده‌سازی</span></td><td>—</td></tr>
+      <tr><td class="code">B24</td><td>داشبورد مدیریتی</td><td>۳</td><td><span class="st next">⏳ در حال پیاده‌سازی</span></td><td>—</td></tr>
+      <tr><td class="code">B25</td><td>پیشنهاد مشاور AI</td><td>۴</td><td><span class="st next">⏳</span></td><td>نیازمند تصمیم D07</td></tr>
+      <tr><td class="code">B26</td><td>خلاصه/پیش‌نویس AI</td><td>۴</td><td><span class="st next">⏳</span></td><td>نیازمند تصمیم D07</td></tr>
+      <tr><td class="code">B27</td><td>ML/ارزیابی مدل</td><td>۵</td><td><span class="st next">⏳</span></td><td>—</td></tr>
+      <tr><td class="code">B28</td><td>یکپارچه‌سازی بیرونی</td><td>۵</td><td><span class="st next">⏳</span></td><td>—</td></tr>
+      <tr><td class="code">B29</td><td>بکاپ/بازیابی/ممیزی</td><td>۱</td><td><span class="st part">جزئی</span></td><td>اسکریپت‌ها آماده؛ اجرای drill باقی</td></tr>
+      <tr><td class="code">B30</td><td>QA/استقرار/تحویل</td><td>۱</td><td><span class="st part">جزئی</span></td><td>deployment.md + smoke؛ UAT/tag باقی</td></tr>
+      <tr><td class="code">B31</td><td>مراکز/شعب</td><td>۱</td><td><span class="st done">کامل</span></td><td>slug/مختصات دو لایه</td></tr>
+      <tr><td class="code">B32</td><td>موضوعات</td><td>۱</td><td><span class="st done">کامل</span></td><td>منع چرخه</td></tr>
+      <tr><td class="code">B33</td><td>CMS مقاله/رسانه</td><td>۳</td><td><span class="st next">⏳ در حال پیاده‌سازی</span></td><td>topics+files آماده</td></tr>
+      <tr><td class="code">B34</td><td>دوره و درس</td><td>۳</td><td><span class="st next">⏳ در حال پیاده‌سازی</span></td><td>—</td></tr>
+      <tr><td class="code">B35</td><td>فروش/ثبت‌نام دوره</td><td>۳</td><td><span class="st next">⏳ در حال پیاده‌سازی</span></td><td>—</td></tr>
+      <tr><td class="code">B36</td><td>آزمون/گواهی</td><td>۳</td><td><span class="st next">⏳ در حال پیاده‌سازی</span></td><td>—</td></tr>
+      <tr><td class="code">B37</td><td>تست روان‌شناسی</td><td>۴</td><td><span class="st next">⏳</span></td><td>رضایت/نسخه‌بندی آماده</td></tr>
+      <tr><td class="code">B38</td><td>پیام/اعلان کانال‌ها</td><td>۱</td><td><span class="st part">جزئی</span></td><td>هسته امن کامل؛ قالب/retry کانال باقی</td></tr>
+      <tr><td class="code">B39</td><td>فایل امن</td><td>۱</td><td><span class="st done">کامل</span></td><td>presigned+قرنطینه+ticket 60s</td></tr>
+      <tr><td class="code">B40</td><td>نقشه nearby</td><td>۱</td><td><span class="st done">کامل</span></td><td>هاورساین؛ مکان ذخیره نمی‌شود</td></tr>
+      <tr><td class="code">B41</td><td>رضایت/حاکمیت داده</td><td>۱</td><td><span class="st done">کامل</span></td><td>trigger تغییرناپذیری</td></tr>
+      <tr><td class="code">B42</td><td>پنل ادمین ملی</td><td>۱</td><td><span class="st done">کامل</span></td><td>داشبورد/کاربران/پرونده/مراکز/گزارشات/لاگ + UI وب — ۲۴ تست</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="section">
+  <h2>کارهای باقی‌مانده (به ترتیب اولویت اجرا)</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3>در دست اجرا — انتشار ۳ (مالی و آموزش · ۲۵۳ نفرروز)</h3>
+      <ul>
+        <li>B21 سازمان‌ها، قرارداد، اعضا و سهم پرداخت (۲۲ نفرروز)</li>
+        <li>B22 کدینگ، سند حسابداری، تسویه و مغایرت (۳۴ نفرروز)</li>
+        <li>B23 نظرسنجی، شکایت و تیکت پشتیبانی (۱۳ نفرروز)</li>
+        <li>B24 داشبورد رزرو/فروش/عملکرد شعب (۲۲ نفرروز)</li>
+        <li>B33 CMS مقاله/خبر/پادکست/ویدئو + صفحات عمومی (۲۳ نفرروز)</li>
+        <li>B34 دوره و درس ویدئویی/PDF (۳۳ نفرروز)</li>
+        <li>B35 فروش و ثبت‌نام دوره (۲۳ نفرروز)</li>
+        <li>B36 آزمون پایان دوره و گواهی (۲۷ نفرروز)</li>
+        <li>UI وب برای ماژول‌های مالی و آموزشی</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>بعد از انتشار ۳</h3>
+      <ul>
+        <li>B25 پیشنهاد مشاور AI + B26 خلاصه AI (نیازمند تصمیم D07) · ۴۶ نفرروز</li>
+        <li>B37 تست روان‌شناسی نسخه‌دار و تفسیر · ۳۷ نفرروز</li>
+        <li>B27 ML ارزیابی‌شده + B28 یکپارچه‌سازی بیرونی · ۳۴ نفرروز</li>
+        <li>تکمیل B17: دموی مرورگر و UAT اپ Flutter</li>
+        <li>B29: اجرای drill بازیابی · B30: UAT و tag انتشار</li>
+        <li>B38: قالب پیام و retry کانال‌ها (SMS/Email واقعی پس از D04)</li>
+        <li>تصمیم‌های باز مدیریت: D02 درگاه، D03 نقشه، D05 میزبانی، D08 ناظر علمی</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>تاریخچه به‌روزرسانی‌ها</h2>
+  <ul class="log">
+    <li>
+      <span class="t">۲۶ اکتبر ۲۰۲۶ — دستهٔ ۱ (انتشار ۳)</span>
+      <b>خلاصه وضعیت اولیه + B18 کیف پول + B19 تخفیف + B20 استرداد</b> —
+      تحلیل شکاف کامل سند v0.2 با مخزن (قبل از این دسته: ۲۲/۴۲ قلم کامل، ~۵۳٪ وزنی).
+      پیاده‌سازی: مدل‌ها + مهاجرت 0015 + سرویس‌ها + API + مجوزهای RBAC (wallet.manage،
+      discounts.manage، refunds.manage) + ادغام تخفیف در POST /orders + شارژ کیف پول از
+      درگاه (wallet-topups) + پرداخت سفارش از کیف پول (wallet/pay) + چرخه کامل استرداد
+      با واریز به کیف پول. <b>۲۲ تست جدید — کل ۲۱۳ تست سبز + ruff پاک.</b>
+    </li>
+  </ul>
+</div>
+
+<div class="footer">
+  Rosepsy · سامانه یکپارچه کلینیک رز · این فایل با هر push به‌روزرسانی می‌شود — مرجع وضعیت: docs/backlog-status.md
+</div>
+
+</div>
+</body>
+</html>

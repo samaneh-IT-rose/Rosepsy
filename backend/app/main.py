@@ -19,6 +19,7 @@ from app.api import (
     clinics,
     consents,
     consultants,
+    discounts,
     files,
     health,
     invoices,
@@ -26,8 +27,10 @@ from app.api import (
     notifications,
     orders,
     pricing,
+    refunds,
     roles,
     topics,
+    wallet,
 )
 from app.api.schemas import envelope
 from app.core.config import settings
@@ -39,6 +42,22 @@ logger = logging.getLogger("roz.http")
 ERROR_MESSAGES = {
     "UNAUTHORIZED": "احراز هویت لازم است",
     "FORBIDDEN": "دسترسی غیرمجاز است",
+    "WALLET_INSUFFICIENT_FUNDS": "مانده کیف پول کافی نیست",
+    "WALLET_AMOUNT_INVALID": "مبلغ تراکنش کیف پول نامعتبر است",
+    "DISCOUNT_NOT_FOUND": "کد تخفیف یافت نشد",
+    "DISCOUNT_INACTIVE": "کد تخفیف غیرفعال است",
+    "DISCOUNT_NOT_STARTED": "کد تخفیف هنوز شروع نشده است",
+    "DISCOUNT_EXPIRED": "کد تخفیف منقضی شده است",
+    "DISCOUNT_MIN_AMOUNT": "مبلغ سفارش کمتر از حداقل مجاز است",
+    "DISCOUNT_CAP_REACHED": "سقف مصرف کد تخفیف تکمیل شده است",
+    "DISCOUNT_USER_CAP_REACHED": "سقف مصرف شما از این کد تکمیل شده است",
+    "REFUND_ORDER_NOT_PAID": "استرداد فقط برای سفارش پرداخت‌شده ممکن است",
+    "REFUND_AMOUNT_INVALID": "مبلغ استرداد نامعتبر است",
+    "REFUND_EXCEEDS_REMAINING": "مبلغ استرداد از باقیمانده قابل استرداد بیشتر است",
+    "REFUND_REQUEST_EXISTS": "یک درخواست استرداد فعال برای این سفارش وجود دارد",
+    "REFUND_NOT_APPROVED": "این درخواست تأیید نشده است",
+    "REFUND_ALREADY_EXECUTED": "این درخواست قبلاً اجرا شده است",
+    "INVALID_REFUND_TRANSITION": "انتقال وضعیت استرداد مجاز نیست",
 }
 
 
@@ -134,6 +153,9 @@ app.include_router(topics.router, prefix=settings.API_V1_PREFIX)
 app.include_router(availability.router, prefix=settings.API_V1_PREFIX)
 app.include_router(booking.router, prefix=settings.API_V1_PREFIX)
 app.include_router(orders.router, prefix=settings.API_V1_PREFIX)
+app.include_router(wallet.router, prefix=settings.API_V1_PREFIX)
+app.include_router(discounts.router, prefix=settings.API_V1_PREFIX)
+app.include_router(refunds.router, prefix=settings.API_V1_PREFIX)
 app.include_router(invoices.router, prefix=settings.API_V1_PREFIX)
 app.include_router(notifications.router, prefix=settings.API_V1_PREFIX)
 app.include_router(files.router, prefix=settings.API_V1_PREFIX)

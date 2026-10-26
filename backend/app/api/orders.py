@@ -1,7 +1,7 @@
 import uuid
 from datetime import UTC, datetime
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from sqlalchemy import select
@@ -28,6 +28,11 @@ ACTIVE_ORDER_STATUSES = ("draft", "awaiting_payment", "paid")
 
 class OrderIn(BaseModel):
     appointment_id: uuid.UUID
+    discount_code: str | None = Field(default=None, min_length=3, max_length=40)
+
+
+class WalletTopupIn(BaseModel):
+    amount: int = Field(gt=0)
 
 
 class PaymentStartIn(BaseModel):
@@ -49,6 +54,8 @@ def _order_data(o: Order) -> dict:
         "currency": o.currency,
         "status": o.status,
         "price_snapshot": o.price_snapshot,
+        "discount_id": str(o.discount_id) if o.discount_id else None,
+        "discount_amount": int(o.discount_amount or 0),
         "created_at": o.created_at.isoformat(),
     }
 
@@ -89,6 +96,28 @@ def create_order(
     if not snapshot or int(snapshot.get("amount", 0)) <= 0:
         return error_response("NOTHING_TO_PAY", "این نوبت هزینه‌ای برای پرداخت ندارد", 409)
 
+    base_amount = int(snapshot["amount"])
+    discount = None
+    discount_amount = 0
+    if body.discount_code:
+        from app.services.discounts import quote_discount
+
+        try:
+            discount, discount_amount = quote_discount(
+                db,
+                code=body.discount_code,
+                user_id=user.id,
+                base_amount=base_amount,
+            )
+        except HTTPException as exc:
+            return error_response(
+                str(exc.detail), "کد تخفیف قابل استفاده نیست", exc.status_code
+            )
+
+    final_amount = base_amount - discount_amount
+    if final_amount <= 0:
+        return error_response("ORDER_AMOUNT_INVALID", "مبلغ نهایی سفارش نامعتبر است", 422)
+
     active = db.execute(
         select(Order).where(
             Order.appointment_id == appt.id, Order.status.in_(ACTIVE_ORDER_STATUSES)
@@ -106,13 +135,27 @@ def create_order(
         user_id=user.id,
         appointment_id=appt.id,
         order_type="appointment",
-        amount=int(snapshot["amount"]),
+        amount=final_amount,
         currency=snapshot.get("currency", "IRR"),
         status="awaiting_payment",
         idempotency_key=idem,
         price_snapshot=snapshot,
+        discount_id=discount.id if discount else None,
+        discount_amount=discount_amount,
     )
     db.add(order)
+    db.flush()
+    if discount is not None:
+        from app.models.finance import DiscountRedemption
+
+        db.add(
+            DiscountRedemption(
+                discount_id=discount.id,
+                user_id=user.id,
+                order_id=order.id,
+                amount_applied=discount_amount,
+            )
+        )
     db.commit()
     write_audit(
         db,
@@ -122,7 +165,53 @@ def create_order(
         resource_type="order",
         resource_id=order.id,
         request_id=request_id_var.get(),
-        detail={"amount": int(order.amount)},
+        detail={"amount": int(order.amount), "discount_amount": discount_amount},
+    )
+    return JSONResponse(status_code=201, content=envelope(data=_order_data(order)))
+
+
+@router.post("/wallet-topups", status_code=201)
+def create_wallet_topup(
+    body: WalletTopupIn,
+    request: Request,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Create a wallet topup order (B18): paid via the normal gateway flow;
+    the callback credits the wallet inside the same transaction."""
+    idem = (request.headers.get("Idempotency-Key") or "").strip()
+    if not idem or len(idem) > 80:
+        return error_response("MISSING_IDEMPOTENCY_KEY", "هدر Idempotency-Key الزامی است", 400)
+
+    replay = db.execute(
+        select(Order).where(Order.user_id == user.id, Order.idempotency_key == idem)
+    ).scalar_one_or_none()
+    if replay is not None:
+        return JSONResponse(
+            status_code=200,
+            content=envelope(data=_order_data(replay), extra_meta={"idempotent_replay": True}),
+        )
+
+    order = Order(
+        user_id=user.id,
+        order_type="wallet_topup",
+        amount=body.amount,
+        currency="IRR",
+        status="awaiting_payment",
+        idempotency_key=idem,
+        price_snapshot={"kind": "wallet_topup", "amount": body.amount},
+    )
+    db.add(order)
+    db.commit()
+    write_audit(
+        db,
+        actor_user_id=user.id,
+        action="wallet.topup_order",
+        outcome="allowed",
+        resource_type="order",
+        resource_id=order.id,
+        request_id=request_id_var.get(),
+        detail={"amount": body.amount},
     )
     return JSONResponse(status_code=201, content=envelope(data=_order_data(order)))
 
@@ -227,20 +316,36 @@ def payments_callback(
         payment.status = "verified"
         payment.verified_at = datetime.now(UTC)
         order.status = "paid"
-        if order.appointment_id is not None:
-            appt = db.get(Appointment, order.appointment_id)
-            if appt is not None and appt.status == "pending_payment":
-                appt.status = "confirmed"
-                fulfillment = fulfill_paid_appointment(db, appointment=appt)
-        from app.services.invoicing import create_invoice_for_order
+        if order.order_type == "wallet_topup":
+            from app.services.wallet import credit_wallet
 
-        invoice = create_invoice_for_order(db, order)
-        invoice_id = str(invoice.id)
+            credit_wallet(
+                db,
+                user_id=order.user_id,
+                amount=int(order.amount),
+                entry_type="topup",
+                order_id=order.id,
+                note=f"topup:{order.id}",
+            )
+        else:
+            if order.appointment_id is not None:
+                appt = db.get(Appointment, order.appointment_id)
+                if appt is not None and appt.status == "pending_payment":
+                    appt.status = "confirmed"
+                    fulfillment = fulfill_paid_appointment(db, appointment=appt)
+            from app.services.invoicing import create_invoice_for_order
+
+            invoice = create_invoice_for_order(db, order)
+            invoice_id = str(invoice.id)
         enqueue_event(
             db,
             user_id=order.user_id,
             event_type="payment.success",
-            payload={"order_id": str(order.id), "amount": int(order.amount)},
+            payload={
+                "order_id": str(order.id),
+                "amount": int(order.amount),
+                "kind": order.order_type,
+            },
         )
     else:
         payment.status = "failed"
