@@ -262,6 +262,7 @@ def public_courses(
     return envelope(
         data=[
             {
+                "id": str(c.id),
                 "title": c.title,
                 "slug": c.slug,
                 "summary": c.summary,

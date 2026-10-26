@@ -45,6 +45,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 }
 
 export const api = {
+  request: request,
   requestOtp: (phone: string) =>
     request<{ challenge_id: string; expires_in_seconds: number }>('/auth/otp/request', {
       method: 'POST',
