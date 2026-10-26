@@ -43,10 +43,14 @@ async function patch<T>(path: string, body: unknown): Promise<T> {
   return json.data;
 }
 
-async function post<T>(path: string, body?: unknown): Promise<T> {
+async function post<T>(path: string, body?: unknown, idempotencyKey?: string): Promise<T> {
   const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || '/api/v1'}${path}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...api_token() },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}),
+      ...api_token(),
+    },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
   const json = (await res.json()) as Envelope<T>;
@@ -278,3 +282,109 @@ export const getLogs = (params: string) =>
 
 // keep the shared api import used for typing parity
 export { api };
+
+// ───────────────── release 3 · finance admin (B18-B22) ─────────────────
+export interface WalletRow {
+  id: string;
+  user_id: string;
+  currency: string;
+  balance: number;
+  is_active: boolean;
+}
+
+export interface WalletEntryRow {
+  id: string;
+  direction: 'credit' | 'debit';
+  amount: number;
+  balance_after: number;
+  entry_type: string;
+  note: string | null;
+  created_at: string;
+}
+
+export const getWallets = (q = '') =>
+  get<WalletRow[]>(`/wallets${q ? `?q=${encodeURIComponent(q)}` : ''}`);
+
+export const getUserWallet = (userId: string) => get<WalletRow>(`/wallets/${userId}`);
+
+export const getUserWalletEntries = (userId: string) =>
+  get<WalletEntryRow[]>(`/wallets/${userId}/entries`);
+
+export const creditUserWallet = (userId: string, amount: number, note?: string, idem?: string) =>
+  post<WalletEntryRow>('/wallet/credits', { user_id: userId, amount, note: note || null }, idem);
+
+export interface DiscountRow {
+  id: string;
+  code: string;
+  kind: 'percent' | 'fixed';
+  value: number;
+  min_order_amount: number;
+  max_redemptions_total: number | null;
+  max_redemptions_per_user: number | null;
+  starts_at: string | null;
+  ends_at: string | null;
+  is_active: boolean;
+}
+
+export const getDiscounts = () => get<DiscountRow[]>('/discounts');
+
+export const createDiscount = (body: Record<string, unknown>) => post<DiscountRow>('/discounts', body);
+
+export interface RefundRow {
+  id: string;
+  order_id: string;
+  user_id: string;
+  amount: number;
+  reason: string;
+  status: string;
+  decision_note: string | null;
+  created_at: string;
+  executed_amount: number | null;
+}
+
+export const getRefunds = () => get<RefundRow[]>('/refund-requests');
+
+export const refundAction = (id: string, action: 'review' | 'approve' | 'reject' | 'execute', note?: string) =>
+  post<RefundRow>(`/refund-requests/${id}/${action}`, note ? { note } : {});
+
+export interface AccountRow {
+  id: string;
+  code: string;
+  name: string;
+  kind: string;
+  balance: number;
+}
+
+export interface JournalRow {
+  id: string;
+  entry_no: string;
+  description: string | null;
+  source_type: string | null;
+  posted_at: string;
+  lines: { account_code: string | null; account_name: string | null; debit: number; credit: number }[];
+}
+
+export const getAccounts = () => get<AccountRow[]>('/accounts');
+export const createAccount = (body: { code: string; name: string; kind: string }) =>
+  post<AccountRow>('/accounts', body);
+export const getJournalEntries = () => get<JournalRow[]>('/journal-entries');
+export const createJournalEntry = (body: {
+  description?: string;
+  lines: { account_id: string; debit: number; credit: number }[];
+}) => post<JournalRow>('/journal-entries', body);
+
+export interface SettlementRow {
+  id: string;
+  consultant_id: string;
+  period_from: string;
+  period_to: string;
+  gross_amount: number;
+  share_percent: number;
+  net_amount: number;
+  status: string;
+  paid_at: string | null;
+}
+
+export const getSettlements = () => get<SettlementRow[]>('/settlements');
+export const createSettlement = (body: Record<string, unknown>) => post<SettlementRow>('/settlements', body);
+export const advanceSettlement = (id: string) => post<SettlementRow>(`/settlements/${id}/advance`, {});

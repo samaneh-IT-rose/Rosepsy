@@ -72,14 +72,14 @@ tbody tr:last-child td{border-bottom:none}
 <div class="hero">
   <h1>ردیاب پیشرفت پروژه Rosepsy</h1>
   <p>سامانه یکپارچه خدمات مشاوره و آموزش روان‌شناسی کلینیک رز — مقایسه زندهٔ اجرا با سند جامع v0.2</p>
-  <span class="badge">آخرین به‌روزرسانی: ۲۶ اکتبر ۲۰۲۶ (۴ آبان ۱۴۰۵) · Commit دستهٔ ۴ — UI وب انتشار ۳</span>
+  <span class="badge">آخرین به‌روزرسانی: ۲۶ اکتبر ۲۰۲۶ (۴ آبان ۱۴۰۵) · Commit دستهٔ ۵ — B37 تست روان‌شناسی + پنل ادمین مالی</span>
 </div>
 
 <div class="kpis">
-  <div class="kpi"><strong>۸۰٪</strong><small>پیشرفت وزنی کل پروژه (برآورد نفرروز سند)</small></div>
-  <div class="kpi teal"><strong>۳۲ / ۴۱</strong><small>قلم بک‌لاگ کامل (B42 اضافی هم کامل) · ۴ جزئی · ۵ باقی</small></div>
-  <div class="kpi green"><strong>۲۴۰</strong><small>تست خودکار سبز (۱۹۱ قبلی + ۴۹ جدید)</small></div>
-  <div class="kpi gold"><strong>۹۷٪</strong><small>پیشرفت انتشار ۳ (۲۴۵ از ۲۵۳ نفرروز)</small></div>
+  <div class="kpi"><strong>۸۴٪</strong><small>پیشرفت وزنی کل پروژه (برآورد نفرروز سند)</small></div>
+  <div class="kpi teal"><strong>۳۳ / ۴۱</strong><small>قلم بک‌لاگ کامل (B42 اضافی هم کامل) · ۴ جزئی · ۴ باقی</small></div>
+  <div class="kpi green"><strong>۲۵۳</strong><small>تست خودکار سبز — صفر خطا (ruff پاک)</small></div>
+  <div class="kpi gold"><strong>۴۷٪</strong><small>پیشرفت انتشار ۴ (۴۱ از ۸۷ نفرروز — B37 کامل)</small></div>
 </div>
 
 <div class="section">
@@ -97,13 +97,13 @@ tbody tr:last-child td{border-bottom:none}
   </div>
   <div class="bar-row">
     <span class="lbl">انتشار ۳ — مالی و آموزش <small>B18–B24، B33–B36 · ۲۵۳ نفرروز</small></span>
-    <span class="bar done"><i style="width:97%"></i></span>
-    <span class="pct">۹۷٪</span>
+    <span class="bar done"><i style="width:98%"></i></span>
+    <span class="pct">۹۸٪</span>
   </div>
   <div class="bar-row">
     <span class="lbl">انتشار ۴ — ارزیابی و AI <small>B25، B26، B37 · ۸۷ نفرروز</small></span>
-    <span class="bar"><i style="width:0%"></i></span>
-    <span class="pct">۰٪</span>
+    <span class="bar"><i style="width:47%"></i></span>
+    <span class="pct">۴۷٪</span>
   </div>
   <div class="bar-row">
     <span class="lbl">انتشار ۵ — بلوغ داده <small>B27، B28 · ۳۶ نفرروز</small></span>
@@ -136,13 +136,13 @@ tbody tr:last-child td{border-bottom:none}
       <tr><td class="code">B15</td><td>یادداشت/اصلاحیه</td><td>۲</td><td><span class="st done">کامل</span></td><td>تأیید→منجمد</td></tr>
       <tr><td class="code">B16</td><td>پایش جلسه</td><td>۲</td><td><span class="st done">کامل</span></td><td>وضعیت جدا از محتوا</td></tr>
       <tr><td class="code">B17</td><td>اپ Flutter</td><td>۲</td><td><span class="st part">جزئی</span></td><td>ورود/نوبت/اعلان/پرداخت آماده؛ APK قبلاً روی دستگاه واقعی؛ دمو مرورگر معوق (محیطی)</td></tr>
-      <tr><td class="code">B18</td><td>کیف پول</td><td>۳</td><td><span class="st ui">بک‌اند کامل</span></td><td>ledger+قفل ردیفی+شارژ درگاهی+پرداخت از اعتبار — ۸ تست</td></tr>
-      <tr><td class="code">B19</td><td>کد تخفیف</td><td>۳</td><td><span class="st ui">بک‌اند کامل</span></td><td>سقف کل/کاربر با lock؛ ادغام در سفارش — ۷ تست</td></tr>
-      <tr><td class="code">B20</td><td>استرداد وجه</td><td>۳</td><td><span class="st ui">بک‌اند کامل</span></td><td>چرخه submitted→executed؛ واریز به کیف پول — ۷ تست</td></tr>
-      <tr><td class="code">B21</td><td>سازمان‌ها</td><td>۳</td><td><span class="st ui">بک‌اند کامل</span></td><td>قرارداد + عضویت با اعتبار زمانی — ۳ تست</td></tr>
-      <tr><td class="code">B22</td><td>حسابداری/تسویه</td><td>۳</td><td><span class="st ui">بک‌اند کامل</span></td><td>سند متوازن + idempotent به رویداد مالی + خودنویسی در پرداخت — ۵ تست</td></tr>
-      <tr><td class="code">B23</td><td>نظرسنجی/تیکت</td><td>۳</td><td><span class="st ui">بک‌اند کامل</span></td><td>بدون افشای داده درمانی؛ گردش کار پشتیبانی — ۴ تست</td></tr>
-      <tr><td class="code">B24</td><td>داشبورد مدیریتی</td><td>۳</td><td><span class="st ui">بک‌اند کامل</span></td><td>KPI رزرو/فروش/۷روز/خدمات برتر — ۲ تست</td></tr>
+      <tr><td class="code">B18</td><td>کیف پول</td><td>۳</td><td><span class="st done">کامل</span></td><td>بک‌اند + UI ادمین (فهرست/گردش/شارژ با Idempotency) + صفحه کاربر</td></tr>
+      <tr><td class="code">B19</td><td>کد تخفیف</td><td>۳</td><td><span class="st done">کامل</span></td><td>بک‌اند + UI ادمین ایجاد/فهرست کدها — ۷ تست</td></tr>
+      <tr><td class="code">B20</td><td>استرداد وجه</td><td>۳</td><td><span class="st done">کامل</span></td><td>بک‌اند + UI ادمین چرخه کامل با دکمه‌های اقدام — ۷ تست</td></tr>
+      <tr><td class="code">B21</td><td>سازمان‌ها</td><td>۳</td><td><span class="st ui">بک‌اند کامل</span></td><td>قرارداد + عضویت با اعتبار زمانی؛ UI ادمین سازمان‌ها باقی — ۳ تست</td></tr>
+      <tr><td class="code">B22</td><td>حسابداری/تسویه</td><td>۳</td><td><span class="st done">کامل</span></td><td>بک‌اند + UI ادمین کدینگ/سند دوطرفه/تسویه مشاوران — ۵ تست</td></tr>
+      <tr><td class="code">B23</td><td>نظرسنجی/تیکت</td><td>۳</td><td><span class="st ui">بک‌اند کامل</span></td><td>بدون افشای داده درمانی؛ UI پشتیبانی/نظرسنجی باقی — ۴ تست</td></tr>
+      <tr><td class="code">B24</td><td>داشبورد مدیریتی</td><td>۳</td><td><span class="st done">کامل</span></td><td>KPI در داشبورد ادمین + صفحه گزارشات — ۲ تست</td></tr>
       <tr><td class="code">B25</td><td>پیشنهاد مشاور AI</td><td>۴</td><td><span class="st next">⏳</span></td><td>نیازمند تصمیم D07</td></tr>
       <tr><td class="code">B26</td><td>خلاصه/پیش‌نویس AI</td><td>۴</td><td><span class="st next">⏳</span></td><td>نیازمند تصمیم D07</td></tr>
       <tr><td class="code">B27</td><td>ML/ارزیابی مدل</td><td>۵</td><td><span class="st next">⏳</span></td><td>—</td></tr>
@@ -155,7 +155,7 @@ tbody tr:last-child td{border-bottom:none}
       <tr><td class="code">B34</td><td>دوره و درس</td><td>۳</td><td><span class="st ui">بک‌اند کامل</span></td><td>قاعده قیمت + دروازه انتشار با درس معتبر + نسخه درس منتشرشده — ۴ تست</td></tr>
       <tr><td class="code">B35</td><td>فروش/ثبت‌نام دوره</td><td>۳</td><td><span class="st ui">بک‌اند کامل</span></td><td>رایگان مستقیم؛ پولی فقط بعد تأیید سرور؛ دسترسی دقیقاً یک‌بار — ۳ تست</td></tr>
       <tr><td class="code">B36</td><td>آزمون/گواهی</td><td>۳</td><td><span class="st ui">بک‌اند کامل</span></td><td>نمره‌گذاری سمت سرور؛ سقف تلاش؛ گواهی یکتا + استعلام عمومی ماسک‌شده — ۴ تست</td></tr>
-      <tr><td class="code">B37</td><td>تست روان‌شناسی</td><td>۴</td><td><span class="st next">⏳</span></td><td>رضایت/نسخه‌بندی آماده</td></tr>
+      <tr><td class="code">B37</td><td>تست روان‌شناسی</td><td>۴</td><td><span class="st done">کامل</span></td><td>نسخه‌دار + رضایت پیش از اجرا + نمره‌گذاری سروری + تفسیر ردپذیر به قاعده مصوب + حریم نتیجه (access_events) + UI کاربر و صف بازبینی ناظر علمی — ۴ تست</td></tr>
       <tr><td class="code">B38</td><td>پیام/اعلان کانال‌ها</td><td>۱</td><td><span class="st part">جزئی</span></td><td>هسته امن کامل؛ قالب/retry کانال باقی</td></tr>
       <tr><td class="code">B39</td><td>فایل امن</td><td>۱</td><td><span class="st done">کامل</span></td><td>presigned+قرنطینه+ticket 60s</td></tr>
       <tr><td class="code">B40</td><td>نقشه nearby</td><td>۱</td><td><span class="st done">کامل</span></td><td>هاورساین؛ مکان ذخیره نمی‌شود</td></tr>
@@ -170,12 +170,12 @@ tbody tr:last-child td{border-bottom:none}
   <h2>کارهای باقی‌مانده (به ترتیب اولویت اجرا)</h2>
   <div class="grid2">
     <div class="card">
-      <h3>در دست اجرا — بستن انتشار ۳ و ورود به انتشار ۴</h3>
+      <h3>در دست اجرا — بستن انتشار ۴ و جزئی‌ها</h3>
       <ul>
         <li>B25 پیشنهاد مشاور AI + B26 خلاصه AI (نیازمند تصمیم D07) · ۴۶ نفرروز</li>
-        <li>B37 تست روان‌شناسی نسخه‌دار و تفسیر · ۳۷ نفرروز</li>
+        <li>محتوای علمی مصوب ۱۲ دسته آزمون (تحویل محصولی سند) و PDF فارسی گواهی/فاکتور</li>
         <li>تکمیل جزئی‌ها: B17 دموی مرورگر + UAT · B29 drill بازیابی · B30 UAT/tag · B38 قالب و retry کانال</li>
-        <li>UI ادامه: پنل ادمین برای ماژول‌های مالی/آموزشی + صفحه جزئیات دوره با پخش درس</li>
+        <li>UI ادامه: ادمین سازمان‌ها (B21) و پشتیبانی/نظرسنجی (B23)، ادمین مدیریت دوره‌ها/محتوا، صفحه پخش درس دوره</li>
       </ul>
     </div>
     <div class="card">
@@ -192,6 +192,21 @@ tbody tr:last-child td{border-bottom:none}
 <div class="section">
   <h2>تاریخچه به‌روزرسانی‌ها</h2>
   <ul class="log">
+    <li>
+      <span class="t">۲۶ اکتبر ۲۰۲۶ — دستهٔ ۵ (انتشار ۴ + پنل ادمین مالی)</span>
+      <b>B37 تست روان‌شناسی و تفسیر — کامل:</b> شِمای psych با ۶ جدول (مهاجرت 0018)،
+      چرخهٔ حالت started→consented→in_progress→scored→reviewed‖abandoned،
+      دروازهٔ رضایت سروری (B41: بدون رضایت معتبر سؤال‌ها نمایش داده نمی‌شود)،
+      نسخهٔ ثابت پاسخ‌ها (اسنپ‌شات سؤال/گزینه در شروع)، نمره‌گذاری سمت سرور با
+      تفسیر فقط از قواعد تأییدشدهٔ ناظر علمی (انتشار نسخه بدون تأیید علمی ممنوع)،
+      حریم نتیجه (فقط مالک؛ هر خواندن حساس در audit.access_events)، محدودیت سنی،
+      صف بازبینی ناظر علمی. API: /psych-tests، /psych-test-versions/{id}/approve|publish،
+      /psych-tests/{id}/attempts، /psych-attempts/{id}/consent|answers|submit|abandon|review،
+      /me/psych-results. <b>UI کاربر:</b> کاتالوگ → معرفی → رضایت → اجرا → نتیجه + «نتایج من».
+      <b>پنل ادمین مالی:</b> کیف پول‌ها (فهرست/گردش/شارژ دستی)، کدهای تخفیف (ایجاد/فهرست)،
+      استرداد وجه (چرخهٔ کامل با اقدامات)، حسابداری و تسویه (کدینگ/سند دوطرفه/تسویه مشاوران)
+      — +۴ آیتم منوی ادمین. <b>۴ تست جدید B37 — کل ۲۵۳ تست سبز (شامل ۷ تست فایل B39 که این بار در محیط محلی با S3 جایگزین moto سبز شدند)؛ ruff پاک؛ tsc+build موفق.</b>
+    </li>
     <li>
       <span class="t">۲۶ اکتبر ۲۰۲۶ — دستهٔ ۴ (UI وب انتشار ۳)</span>
       <b>سه صفحهٔ جدید وب (RTL فارسی): دوره‌ها</b> (کاتالوگ عمومی + ثبت‌نام رایگان/پولی + دوره‌های من با پیشرفت)،

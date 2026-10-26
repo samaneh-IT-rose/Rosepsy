@@ -12,7 +12,7 @@ from app.core.db import Base, engine
 from app.core.redis_client import get_redis
 from app.services.sms import get_sms_sender
 
-SCHEMAS = ["core", "booking", "clinical", "finance", "content", "edu", "audit"]
+SCHEMAS = ["core", "booking", "clinical", "finance", "content", "edu", "psych", "audit"]
 TABLES = [
     "edu.certificates",
     "edu.exam_answers",
@@ -77,6 +77,12 @@ TABLES = [
     "core.tariff_versions",
     "core.tariffs",
     "core.topics",
+    "psych.answers",
+    "psych.attempts",
+    "psych.interpretation_rules",
+    "psych.questions",
+    "psych.test_versions",
+    "psych.tests",
     "clinical.submissions",
     "clinical.questionnaire_versions",
     "clinical.questionnaires",

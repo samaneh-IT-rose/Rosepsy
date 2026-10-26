@@ -41,8 +41,9 @@ def test_dashboard_shape_and_menu_count():
     r = client.get("/api/v1/admin/dashboard", headers=_admin_headers())
     assert r.status_code == 200, r.text
     data = r.json()["data"]
-    # doc s.3.1.2: 29 menu items; s.3.1.1: 5 desktop shortcuts; s.3.2: user section
-    assert len(data["menus"]) == 29
+    # doc s.3.1.2: 29 menu items + 4 finance admin pages (release 3 UI) =
+    # 33; s.3.1.1: 5 desktop shortcuts; s.3.2: user section
+    assert len(data["menus"]) == 33
     assert len(data["shortcuts"]) == 5
     assert data["identity"]["badge"] == "کشور"
     assert len(data["user_section"]["links"]) == 5

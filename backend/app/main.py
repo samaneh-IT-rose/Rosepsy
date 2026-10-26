@@ -33,6 +33,7 @@ from app.api import (
     orders,
     organizations,
     pricing,
+    psych,
     refunds,
     roles,
     topics,
@@ -155,6 +156,7 @@ app.include_router(catalog.router, prefix=settings.API_V1_PREFIX)
 app.include_router(consultants.router, prefix=settings.API_V1_PREFIX)
 app.include_router(clinics.router, prefix=settings.API_V1_PREFIX)
 app.include_router(pricing.router, prefix=settings.API_V1_PREFIX)
+app.include_router(psych.router, prefix=settings.API_V1_PREFIX)
 app.include_router(topics.router, prefix=settings.API_V1_PREFIX)
 app.include_router(availability.router, prefix=settings.API_V1_PREFIX)
 app.include_router(booking.router, prefix=settings.API_V1_PREFIX)

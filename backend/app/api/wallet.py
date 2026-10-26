@@ -5,7 +5,7 @@ import uuid
 
 from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, Field
-from sqlalchemy import select
+from sqlalchemy import String, cast, select
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
@@ -67,6 +67,21 @@ def list_wallet_entries(
     )
 
 
+@router.get("/wallets")
+def list_wallets(
+    q: str | None = None,
+    limit: int = 100,
+    user: User = Depends(require_permission("wallet.manage")),
+    db: Session = Depends(get_db),
+):
+    """Finance list of wallets (admin UI): newest first, optional user filter."""
+    qy = select(Wallet).order_by(Wallet.updated_at.desc()).limit(min(limit, 300))
+    if q:
+        qy = qy.where(cast(Wallet.user_id, String).ilike(f"%{q}%"))
+    rows = db.execute(qy).scalars().all()
+    return envelope(data=[wallet_data(db, w) for w in rows])
+
+
 @router.get("/wallets/{user_id}")
 def get_user_wallet(
     user_id: uuid.UUID,
@@ -77,6 +92,37 @@ def get_user_wallet(
     if wallet is None:
         return error_response("WALLET_NOT_FOUND", "کیف پول برای این کاربر ساخته نشده است", 404)
     return envelope(data=wallet_data(db, wallet))
+
+
+@router.get("/wallets/{user_id}/entries")
+def get_user_wallet_entries(
+    user_id: uuid.UUID,
+    user: User = Depends(require_permission("wallet.manage")),
+    db: Session = Depends(get_db),
+):
+    """Ledger of a specific user's wallet (admin UI). Read is audited."""
+    wallet = db.execute(select(Wallet).where(Wallet.user_id == user_id)).scalar_one_or_none()
+    if wallet is None:
+        return error_response("WALLET_NOT_FOUND", "کیف پول برای این کاربر ساخته نشده است", 404)
+    rows = db.execute(
+        select(WalletEntry)
+        .where(WalletEntry.wallet_id == wallet.id)
+        .order_by(WalletEntry.created_at.desc())
+        .limit(200)
+    ).scalars().all()
+    write_audit(
+        db,
+        actor_user_id=user.id,
+        action="wallet.ledger_viewed",
+        outcome="allowed",
+        resource_type="wallet",
+        resource_id=wallet.id,
+    )
+    db.commit()
+    return envelope(
+        data=[entry_data(e) for e in rows],
+        extra_meta={"balance": wallet_balance(db, wallet.id), "count": len(rows)},
+    )
 
 
 @router.post("/wallet/credits")

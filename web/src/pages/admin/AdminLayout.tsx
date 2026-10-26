@@ -8,11 +8,20 @@ import UserProfilePage from './UserProfilePage';
 import CentersPage from './CentersPage';
 import ReportsPage from './ReportsPage';
 import LogsPage from './LogsPage';
+import WalletsAdmin from './WalletsAdmin';
+import DiscountsAdmin from './DiscountsAdmin';
+import RefundsAdmin from './RefundsAdmin';
+import AccountingAdmin from './AccountingAdmin';
 import { Placeholder } from './router';
 
 /** Map a سند menu path → implemented page key. */
 const PATH_TO_PAGE: Record<string, string> = {
   '/admin-editusers': 'users',
+  '/payments': 'wallets',
+  '/wallets': 'wallets',
+  '/discounts': 'discounts',
+  '/refunds': 'refunds',
+  '/accounting': 'accounting',
   '/profile': 'user-profile',
   '/centers': 'centers',
   '/reports': 'reports',
@@ -53,6 +62,14 @@ export default function AdminLayout() {
         return <ReportsPage report={route.params.get('report') ?? undefined} />;
       case 'logs':
         return <LogsPage />;
+      case 'wallets':
+        return <WalletsAdmin />;
+      case 'discounts':
+        return <DiscountsAdmin />;
+      case 'refunds':
+        return <RefundsAdmin />;
+      case 'accounting':
+        return <AccountingAdmin />;
       default:
         return <Placeholder title={DOC_TITLE(route.page)} />;
     }
@@ -113,6 +130,10 @@ export default function AdminLayout() {
 }
 
 const PATH_PAGE: Record<string, string> = {
+  wallets: 'wallets',
+  discounts: 'discounts',
+  refunds: 'refunds',
+  accounting: 'accounting',
   users: 'users',
   'user-profile': 'user-profile',
   centers: 'centers',
@@ -152,4 +173,8 @@ const ICON_EMOJI: Record<string, string> = {
   'file-log': '🧭',
   'file-chm': '🎫',
   'dashboardlist-help': '❓',
+  'dashboardlist-wallet': '👛',
+  'dashboardlist-discount': '🏷️',
+  'dashboardlist-refund': '↩️',
+  'dashboardlist-accounting': '📊',
 };

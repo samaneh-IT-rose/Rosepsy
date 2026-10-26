@@ -6,6 +6,7 @@ import Booking from './pages/Booking';
 import Courses from './pages/Courses';
 import Contents from './pages/Contents';
 import WalletPage from './pages/Wallet';
+import PsychTests from './pages/PsychTests';
 import AdminLayout from './pages/admin/AdminLayout';
 
 function isAdminHash() {
@@ -31,7 +32,7 @@ export default function App() {
 
 function UserApp() {
   const { signedIn } = useAuth();
-  const [tab, setTab] = useState<'home' | 'booking' | 'courses' | 'contents' | 'wallet'>('home');
+  const [tab, setTab] = useState<'home' | 'booking' | 'courses' | 'contents' | 'wallet' | 'tests'>('home');
   if (!signedIn) return <Login />;
   return (
     <div>
@@ -41,12 +42,14 @@ function UserApp() {
         <button onClick={() => setTab('courses')}>دوره‌ها</button>
         <button onClick={() => setTab('contents')}>محتوا</button>
         <button onClick={() => setTab('wallet')}>کیف پول</button>
+        <button onClick={() => setTab('tests')}>تست روان‌شناسی</button>
       </div>
       {tab === 'home' && <Home />}
       {tab === 'booking' && <Booking />}
       {tab === 'courses' && <Courses />}
       {tab === 'contents' && <Contents />}
       {tab === 'wallet' && <WalletPage />}
+      {tab === 'tests' && <PsychTests />}
     </div>
   );
 }

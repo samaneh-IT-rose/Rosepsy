@@ -58,6 +58,8 @@ PERMISSIONS: list[tuple[str, str]] = [
     ("organizations.manage", "مدیریت سازمان‌ها، قرارداد و اعضا"),
     ("accounting.manage", "مدیریت کدینگ، اسناد حسابداری و تسویه"),
     ("tickets.manage", "پیگیری تیکت‌های پشتیبانی"),
+    ("psych.manage", "مدیریت تست‌های روان‌شناسی و نسخه‌های آن"),
+    ("psych.review", "بازبینی علمی نسخه‌ها و نتایج تست (ناظر علمی)"),
     # ── B42 admin panel (doc ساختاریافته) ──
     ("admin.panel", "دسترسی به پنل مدیریت"),
     ("users.manage", "مشاهده و ویرایش کاربران سامانه"),
@@ -93,6 +95,7 @@ GRANTS: dict[str, list[str]] = {
         "organizations.manage",
         "accounting.manage",
     ],
+    "scientific_reviewer": ["psych.review", "psych.manage"],
     "auditor_dpo": ["audit.access.read"],
     "system_admin": [
         "applicants.create",
@@ -125,6 +128,7 @@ GRANTS: dict[str, list[str]] = {
         "questionnaires.manage",
         "encounters.manage",
         "notes.manage",
+        "psych.manage",
         "admin.panel",
         "users.manage",
         "users.switch_session",
