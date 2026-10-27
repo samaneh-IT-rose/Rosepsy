@@ -135,6 +135,95 @@ def list_my_managed_courses(
     return envelope(data=[_course_data(c) for c in rows])
 
 
+@router.get("/courses/{course_id}/detail")
+def course_detail(
+    course_id: uuid.UUID,
+    user: User = Depends(require_permission("contents.manage")),
+    db: Session = Depends(get_db),
+):
+    """Admin UI editor view: modules, lessons and exams of any course (draft included)."""
+    c = db.get(Course, course_id)
+    if c is None:
+        return error_response("COURSE_NOT_FOUND", "دوره یافت نشد", 404)
+    modules = (
+        db.execute(
+            select(CourseModule)
+            .where(CourseModule.course_id == c.id)
+            .order_by(CourseModule.position)
+        )
+        .scalars()
+        .all()
+    )
+    lessons_by_module: dict[uuid.UUID, list] = {}
+    if modules:
+        for lesson in (
+            db.execute(
+                select(Lesson)
+                .where(Lesson.module_id.in_([m.id for m in modules]))
+                .order_by(Lesson.position)
+            )
+            .scalars()
+            .all()
+        ):
+            lessons_by_module.setdefault(lesson.module_id, []).append(lesson)
+    exams = (
+        db.execute(
+            select(CourseExam)
+            .where(CourseExam.course_id == c.id)
+            .order_by(CourseExam.created_at)
+        )
+        .scalars()
+        .all()
+    )
+    exam_ids = [e.id for e in exams]
+    q_counts: dict[uuid.UUID, int] = {}
+    if exam_ids:
+        for q in (
+            db.execute(select(ExamQuestion).where(ExamQuestion.exam_id.in_(exam_ids)))
+            .scalars()
+            .all()
+        ):
+            q_counts[q.exam_id] = q_counts.get(q.exam_id, 0) + 1
+    return envelope(
+        data={
+            **_course_data(c),
+            "modules": [
+                {
+                    "id": str(m.id),
+                    "title": m.title,
+                    "position": m.position,
+                    "lessons": [
+                        {
+                            "id": str(les.id),
+                            "title": les.title,
+                            "lesson_type": les.lesson_type,
+                            "duration_seconds": les.duration_seconds,
+                            "position": les.position,
+                            "is_preview": les.is_preview,
+                            "has_file": les.file_id is not None,
+                            "version": les.version,
+                        }
+                        for les in lessons_by_module.get(m.id, [])
+                    ],
+                }
+                for m in modules
+            ],
+            "exams": [
+                {
+                    "id": str(e.id),
+                    "title": e.title,
+                    "pass_score": e.pass_score,
+                    "max_attempts": e.max_attempts,
+                    "duration_minutes": e.duration_minutes,
+                    "is_active": e.is_active,
+                    "question_count": q_counts.get(e.id, 0),
+                }
+                for e in exams
+            ],
+        }
+    )
+
+
 @router.post("/courses/{course_id}/modules", status_code=201)
 def add_module(
     course_id: uuid.UUID,

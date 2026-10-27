@@ -302,6 +302,62 @@ def add_rule(
     return envelope(data={"id": str(r.id), "status": r.status})
 
 
+@router.get("/psych-test-versions/{version_id}")
+def version_detail(
+    version_id: uuid.UUID,
+    user: User = Depends(require_permission("psych.manage")),
+    db: Session = Depends(get_db),
+):
+    """Admin UI editor view: questions (with option scores) + interpretation rules."""
+    v = db.get(PsychTestVersion, version_id)
+    if v is None:
+        return error_response("PSYCH_VERSION_NOT_FOUND", "نسخه یافت نشد", 404)
+    questions = (
+        db.execute(
+            select(PsychQuestion)
+            .where(PsychQuestion.version_id == v.id)
+            .order_by(PsychQuestion.position)
+        )
+        .scalars()
+        .all()
+    )
+    rules = (
+        db.execute(
+            select(PsychInterpretationRule)
+            .where(PsychInterpretationRule.version_id == v.id)
+            .order_by(PsychInterpretationRule.min_score)
+        )
+        .scalars()
+        .all()
+    )
+    return envelope(
+        data={
+            **_version_data(v),
+            "questions": [
+                {
+                    "id": str(q.id),
+                    "text": q.text,
+                    "position": q.position,
+                    "weight": q.weight,
+                    "options": q.options,
+                }
+                for q in questions
+            ],
+            "rules": [
+                {
+                    "id": str(r.id),
+                    "min_score": r.min_score,
+                    "max_score": r.max_score,
+                    "title": r.title,
+                    "guidance": r.guidance,
+                    "status": r.status,
+                }
+                for r in rules
+            ],
+        }
+    )
+
+
 @router.post("/psych-test-versions/{version_id}/approve")
 def approve_version(
     version_id: uuid.UUID,
@@ -395,6 +451,36 @@ def publish_version(
     )
     db.commit()
     return envelope(data=_version_data(v))
+
+
+@router.get("/psych-tests/manage")
+def manage_tests(
+    user: User = Depends(require_permission("psych.manage")),
+    db: Session = Depends(get_db),
+):
+    """Admin UI listing: every test regardless of status, with its versions."""
+    rows = db.execute(
+        select(PsychTest).order_by(PsychTest.created_at.desc())
+    ).scalars().all()
+    versions_by_test: dict[uuid.UUID, list[dict]] = {}
+    if rows:
+        vrows = (
+            db.execute(
+                select(PsychTestVersion)
+                .where(PsychTestVersion.test_id.in_([t.id for t in rows]))
+                .order_by(PsychTestVersion.version)
+            )
+            .scalars()
+            .all()
+        )
+        for v in vrows:
+            versions_by_test.setdefault(v.test_id, []).append(_version_data(v))
+    return envelope(
+        data=[
+            {**_test_data(t, with_meta=True), "versions": versions_by_test.get(t.id, [])}
+            for t in rows
+        ]
+    )
 
 
 @router.get("/psych-tests")

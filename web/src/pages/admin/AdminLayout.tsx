@@ -12,6 +12,9 @@ import WalletsAdmin from './WalletsAdmin';
 import DiscountsAdmin from './DiscountsAdmin';
 import RefundsAdmin from './RefundsAdmin';
 import AccountingAdmin from './AccountingAdmin';
+import PsychTestsAdmin from './PsychTestsAdmin';
+import ContentsAdmin from './ContentsAdmin';
+import CoursesAdmin from './CoursesAdmin';
 import { Placeholder } from './router';
 
 /** Map a سند menu path → implemented page key. */
@@ -22,6 +25,9 @@ const PATH_TO_PAGE: Record<string, string> = {
   '/discounts': 'discounts',
   '/refunds': 'refunds',
   '/accounting': 'accounting',
+  '/psych-tests': 'psych-tests',
+  '/contents': 'contents',
+  '/courses': 'courses',
   '/profile': 'user-profile',
   '/centers': 'centers',
   '/reports': 'reports',
@@ -70,6 +76,12 @@ export default function AdminLayout() {
         return <RefundsAdmin />;
       case 'accounting':
         return <AccountingAdmin />;
+      case 'psych-tests':
+        return <PsychTestsAdmin />;
+      case 'contents':
+        return <ContentsAdmin />;
+      case 'courses':
+        return <CoursesAdmin />;
       default:
         return <Placeholder title={DOC_TITLE(route.page)} />;
     }
@@ -134,6 +146,9 @@ const PATH_PAGE: Record<string, string> = {
   discounts: 'discounts',
   refunds: 'refunds',
   accounting: 'accounting',
+  'psych-tests': 'psych-tests',
+  contents: 'contents',
+  courses: 'courses',
   users: 'users',
   'user-profile': 'user-profile',
   centers: 'centers',
@@ -177,4 +192,7 @@ const ICON_EMOJI: Record<string, string> = {
   'dashboardlist-discount': '🏷️',
   'dashboardlist-refund': '↩️',
   'dashboardlist-accounting': '📊',
+  'dashboardlist-psych': '🧠',
+  'dashboardlist-contents': '📰',
+  'dashboardlist-courses': '🎓',
 };

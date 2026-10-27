@@ -388,3 +388,210 @@ export interface SettlementRow {
 export const getSettlements = () => get<SettlementRow[]>('/settlements');
 export const createSettlement = (body: Record<string, unknown>) => post<SettlementRow>('/settlements', body);
 export const advanceSettlement = (id: string) => post<SettlementRow>(`/settlements/${id}/advance`, {});
+
+// ───────────────── release 4 · psych admin (B37) ─────────────────
+export interface PsychVersionRow {
+  id: string;
+  test_id: string;
+  version: number;
+  scale_label: string;
+  scoring_method: string;
+  status: 'draft' | 'approved' | 'published' | 'archived';
+  approved_at: string | null;
+  published_at: string | null;
+}
+
+export interface PsychTestRow {
+  id: string;
+  code: string;
+  title: string;
+  purpose: string | null;
+  target_population: string | null;
+  age_min: number | null;
+  age_max: number | null;
+  status: string;
+  scientific_doc: string | null;
+  consent_kind?: string;
+  created_at?: string;
+  versions: PsychVersionRow[];
+}
+
+export const getPsychTestsManage = () => get<PsychTestRow[]>('/psych-tests/manage');
+
+export interface PsychVersionDetail extends PsychVersionRow {
+  questions: {
+    id: string;
+    text: string;
+    position: number;
+    weight: number;
+    options: { label: string; score: number }[];
+  }[];
+  rules: {
+    id: string;
+    min_score: number;
+    max_score: number;
+    title: string;
+    guidance: string;
+    status: string;
+  }[];
+}
+
+export const getPsychVersion = (id: string) => get<PsychVersionDetail>(`/psych-test-versions/${id}`);
+
+export const createPsychTest = (body: Record<string, unknown>) =>
+  post<PsychTestRow>('/psych-tests', body);
+
+export const createPsychVersion = (testId: string, scaleLabel: string) =>
+  post<PsychVersionRow>(`/psych-tests/${testId}/versions`, { scale_label: scaleLabel });
+
+export const addPsychQuestion = (
+  versionId: string,
+  body: { text: string; options: { label: string; score: number }[]; weight?: number; position?: number },
+) => post<{ id: string }>(`/psych-test-versions/${versionId}/questions`, body);
+
+export const addPsychRule = (
+  versionId: string,
+  body: { min_score: number; max_score: number; title: string; guidance: string },
+) => post<{ id: string }>(`/psych-test-versions/${versionId}/interpretation-rules`, body);
+
+export const approvePsychVersion = (id: string) =>
+  post<PsychVersionRow>(`/psych-test-versions/${id}/approve`, {});
+
+export const publishPsychVersion = (id: string) =>
+  post<PsychVersionRow>(`/psych-test-versions/${id}/publish`, {});
+
+export interface PsychAttemptRow {
+  id: string;
+  test_id: string;
+  version_id: string;
+  status: string;
+  started_at: string;
+  raw_score?: number | null;
+  interpretation_title?: string | null;
+  interpretation_text?: string | null;
+  submitted_at?: string | null;
+  reviewed_at?: string | null;
+  review_note?: string | null;
+}
+
+export const getPsychReviewQueue = (status = '') =>
+  get<PsychAttemptRow[]>(`/psych-attempts${status ? `?status=${status}` : ''}`);
+
+export const reviewPsychAttempt = (id: string, note?: string) =>
+  post<PsychAttemptRow>(`/psych-attempts/${id}/review`, note ? { note } : {});
+
+// ───────────────── release 4 · CMS admin (B33) ─────────────────
+export interface ContentRow {
+  id: string;
+  type: 'article' | 'news' | 'podcast' | 'video';
+  title: string;
+  slug: string;
+  summary: string | null;
+  body: string | null;
+  status: 'draft' | 'in_review' | 'published' | 'rejected' | 'archived';
+  source: string | null;
+  seo_title: string | null;
+  seo_description: string | null;
+  published_at: string | null;
+  topics: string[];
+  created_at: string;
+  revisions?: { version: number; snapshot: Record<string, unknown>; created_at: string }[];
+}
+
+export const getContents = () => get<ContentRow[]>('/contents');
+export const getContent = (id: string) => get<ContentRow>(`/contents/${id}`);
+export const createContent = (body: Record<string, unknown>) => post<ContentRow>('/contents', body);
+export const updateContent = (id: string, body: Record<string, unknown>) =>
+  put<ContentRow>(`/contents/${id}`, body);
+export const contentTransition = (
+  id: string,
+  transition: 'submit-review' | 'publish' | 'reject' | 'archive' | 'back-to-draft',
+) => post<ContentRow>(`/contents/${id}/${transition}`, {});
+
+export interface TopicRow {
+  id: string;
+  name: string;
+  slug: string;
+  is_active: boolean;
+}
+
+export const getTopics = () => get<TopicRow[]>('/topics');
+
+async function put<T>(path: string, body: unknown): Promise<T> {
+  const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || '/api/v1'}${path}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...api_token() },
+    body: JSON.stringify(body),
+  });
+  const json = (await res.json()) as Envelope<T>;
+  if (res.status >= 400 || json.errors) {
+    throw new Error(json.errors?.[0]?.message || `HTTP ${res.status}`);
+  }
+  return json.data;
+}
+
+// ───────────────── release 4 · courses admin (B34/B36) ─────────────────
+export interface CourseRow {
+  id: string;
+  title: string;
+  slug: string;
+  summary: string | null;
+  description: string | null;
+  instructor_name: string | null;
+  is_free: boolean;
+  price: number;
+  status: 'draft' | 'published';
+  published_at: string | null;
+}
+
+export interface CourseDetailRow extends CourseRow {
+  modules: {
+    id: string;
+    title: string;
+    position: number;
+    lessons: {
+      id: string;
+      title: string;
+      lesson_type: string;
+      duration_seconds: number;
+      position: number;
+      is_preview: boolean;
+      has_file: boolean;
+      version: number;
+    }[];
+  }[];
+  exams: {
+    id: string;
+    title: string;
+    pass_score: number;
+    max_attempts: number;
+    duration_minutes: number;
+    is_active: boolean;
+    question_count: number;
+  }[];
+}
+
+export const getCourses = () => get<CourseRow[]>('/courses');
+export const getCourseDetail = (id: string) => get<CourseDetailRow>(`/courses/${id}/detail`);
+export const createCourse = (body: Record<string, unknown>) => post<CourseRow>('/courses', body);
+export const addCourseModule = (courseId: string, title: string, position: number) =>
+  post<{ id: string }>(`/courses/${courseId}/modules`, { title, position });
+export const addCourseLesson = (
+  moduleId: string,
+  body: {
+    title: string;
+    lesson_type: 'video' | 'pdf';
+    duration_seconds?: number;
+    position?: number;
+    is_preview?: boolean;
+  },
+) => post<{ id: string }>(`/modules/${moduleId}/lessons`, body);
+export const publishCourse = (id: string) => post<CourseRow>(`/courses/${id}/publish`, {});
+export const createCourseExam = (
+  courseId: string,
+  body: { title: string; pass_score?: number; max_attempts?: number; duration_minutes?: number },
+) => post<{ id: string }>(`/courses/${courseId}/exams`, body);
+export const addExamQuestion = (
+  examId: string,
+  body: { text: string; options: string[]; correct_index: number; weight?: number; position?: number },
+) => post<{ id: string }>(`/course-exams/${examId}/questions`, body);
